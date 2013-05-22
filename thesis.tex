@@ -83,8 +83,6 @@
 \defensemonth{June} \defenseyear{2013}
 \numberofmembers{3} \chair{Zo\"{e} Wood, Ph.D.} \othermemberA{Foaad Khosmood, Ph.D.} \othermemberB{Aaron Keen, Ph.D.} \field{Computer Science} \campus{San Luis Obispo}
 \copyrightyears{seven}	%What does this mean?
-%TODO: Figure out if Aaron Keen has Ph.D. The site doesn't seem to say.
-
 
 \maketitle
 
@@ -134,6 +132,9 @@ Culling out non-visible portions of 3D scenes is important for rendering large c
 
 \chapter{Introduction}
 \label{intro}
+
+\section{Real Time Graphics}
+\label{real-time-graphics}
 
 Real time computer graphics are needed for CAD applications, simulations, video games, and even for just displaying the user interface of an operating system.  Computer graphics can be non-real time, like when doing CGI for a movie.  Each frame can take hours to render, and the result is a very photorealistic image that looks like it?s part of the movie itself.  Millions of frames are generated only for each still frame to be visible for a fraction of a second until the next frame to give the illusion of motion.  Real time graphics also display a frame for only a fraction of a second but are rendered on the fly right as the user is controlling the application.  This means the computer can?t sit there for hours rendering a frame, it has 33.33 milliseconds if trying to render at 30 frames per second.  Movies are typically shown at 25 FPS (frames per second), but 30 FPS is about the threshold until us humans start to notice slightly unresponsive input and jerky movement when directly controlling a real time graphics application.  Most computer monitors update at 60 Hz so real time graphics typically strive for 60 FPS giving an even smoother experience, and this means the computer now only has 16.66 milliseconds to render a frame.
 
