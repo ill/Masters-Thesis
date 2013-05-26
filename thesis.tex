@@ -307,7 +307,7 @@ If the test passes early on, the fragment can be rasterized if it passes other t
 
 The hardware occlusion query is a relatively new feature that is essential to this paper.
 The query measures how many fragments have passed for a set of draw calls.
-If all fragments have passed all tests of the graphics pipeline described earlier, the query will return a positive result.
+The fragments must pass all tests of the graphics pipeline described earlier to contribute to the query results.
 
 \begin{lstlisting}
 //creating a query in OpenGL
@@ -350,7 +350,19 @@ However, this is a naive approach that will negatively affect performance.
 
 The problem with hardware occlusion queries is their results may not be ready to read back when expected.\cite{GpuGem-Occlusion, GpuGem-Queries, CHC, CHCpp}
 The glGetQueryObject call may cause a CPU stall with the results often being available about 3 to 4 frames later.
-The challenge with using hardware occlusion queries is finding a way to effectively use them in later frames to reduce CPU stalls and save the GPU from drawing too many unnecessary objects.
+The problem arises due to the GPU having its own memory and processor where the data must travel across the bus.
+Draw calls are non-blocking and stored in a buffer for the GPU to execute whenever it gets around to it.
+However, retreiving a value back from the GPU can cause a stall since the applicaiton must wait a few milliseconds for the data to travel across the bus.
+When there are thousands of objects to draw, the stalls add up.
+The challenge with using hardware occlusion queries is finding a way to effectively use them in later frames to reduce CPU stalls but also save the GPU from drawing too many unnecessary objects.
+
+Conditional rendering is another recent feature on some of the newer hardware.
+This allows the results of a query to be used in the same frame.
+The GPU knows the results of a query after a draw call since the data is local and doesn't need to travel across the bus.
+The CPU still issues all potentially unnecessary draw calls but the GPU ignores them if the draw call depends on the results of a query.
+If hardware support for conditional rendering is not available, it's forced to run in software and and causes a drop in performance.
+This also doesn't prevent unnecessary traversals of portions of the scene by the CPU that may be invisible.
+It's simply a way to tell the GPU to ignore an already issed draw call.
 
 \section{Spatial Data Structures}
 \label{spatial-data-structures}
@@ -384,7 +396,11 @@ The leaves in the tree contain the objects themselves.
 As the tree is traversed, the bounding box of the query is used to determine what set of children to follow if their bounding box also intersects the query object.
 This kind of structure allows any arbitrary scene layout while grids and quadtrees are constrained to hold the scene within predefined bounds.
 
-TODO: BSP and K/D trees
+K-D trees recursively divide up a space into two halves with axis aligned planes.\cite{Vis-Computations-Densely-Occluded, Doom3-source-review}
+They can look a bit similarly to Octrees in some situations.
+The space is divided in a way that evenly distributes the geometry between the two planes, handling the poorer distribution of Octrees and grids.
+Binary Space Partitioning trees are similar except they divide space with arbitrary planes.
+The final result is an even better distribution of geometry but the algorithm for computing the tree is more time consuming.
 
 \chapter{Related Work}
 \label{related-work}
@@ -449,6 +465,15 @@ The visibility culling algorithm relies on artist generated low detail large occ
 This requires a software rasterizer capable of rendering arbitrary geometry to be implemented.
 Objects such as tanks or soldiers have their bounding rectangle tested against this buffer similarly to how a hardware occlusion query would operate before being queued up for the hardware to render.
 
+\begin{figure}
+\begin{center}
+\includegraphics[width=0.75\textwidth]{Images/Bf3Buffer.jpg}
+\captionfonts
+\caption[Software Z Buffer Buffer]{The low resolution software z buffer from a scene in Battlefield 3. (TODO: cite Culling the battlefield pres)}
+\label{fig:softare-z}
+\end{center}
+\end{figure}
+
 CryENGINE 3, used for games like Crysis 2 and Farcry 3, is another modern game engine capable of rendering large indoor and outdoor environments effectively.\cite{cryengine3, Cryengine-culling-explained}
 Cryengine uses what is called a coverage buffer but avoids implementing a full arbitrary geometry rasterizer by reading back the z buffer from the hardware and using it in later frames.
 As the camera moves around, the coverage buffer needs to be adjusted to correspond more closely to how the current frame looks.
@@ -460,7 +485,7 @@ Cryengine also allows for use of portals and occlusion geometry that they refer 
 \begin{center}
 \includegraphics[width=\textwidth]{Images/CryCoverage.jpg}
 \captionfonts
-\caption[Cry Engine Coverage Buffer]{The coverage buffer used in CryENGINE 3.  The red portions are the holes after reprojecting from previous frames to the current camera angle.}
+\caption[Cry Engine Coverage Buffer]{The coverage buffer used in CryENGINE 3.  The red portions are the holes after reprojecting from previous frames to the current camera angle. (TODO: cite Secrets of Cryengine 3 Pres)}
 \label{fig:cry-coverage}
 \end{center}
 \end{figure}
