@@ -456,6 +456,15 @@ Cryengine reprojects the buffer with the transform of the current camera and the
 After this, like Frostbite 2, objects' bounding rectangles are rasterized and tested against the contents of the coverage buffer.
 Cryengine also allows for use of portals and occlusion geometry that they refer to as antiportals to further augment the visibulity culling algorithm.
 
+\begin{figure}
+\begin{center}
+\includegraphics[width=\textwidth]{Images/CryCoverage.jpg}
+\captionfonts
+\caption[Cry Engine Coverage Buffer]{The coverage buffer used in CryENGINE 3.  The red portions are the holes after reprojecting from previous frames to the current camera angle.}
+\label{fig:cry-coverage}
+\end{center}
+\end{figure}
+
 The dPVS algorithm developed by Aila and Miettenen is another similar algorithm capable of rendering large dynamic environments.\cite{dpvs}
 Their system allows for a combination of various occlusion culling algorithms such as portals and queries.
 The scene is organized by a K/D tree.
