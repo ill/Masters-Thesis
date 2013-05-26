@@ -235,10 +235,6 @@ Portals can also be very tedious for the level designers to keep track of as the
 
 \begin{figure}
 \begin{center}
-\includegraphics[width=0.75\textwidth]{Images/Portal-Culling.png}
-\captionfonts
-\caption[Portal Culling]{An example of portal culling at work.  Zones A, B, C, and E are rendered.}
-\label{fig:portal-culling}
 \includegraphics[width=0.75\textwidth]{Images/OccluderGeomFig.jpg}
 \captionfonts
 \caption[Occluder Geometry]{The detailed wall and its associated low detail occluder geometry shown in red.}
@@ -393,7 +389,86 @@ TODO: BSP and K/D trees
 \chapter{Previous Work}
 \label{previous-work}
 
-\section{}
+Visibility Culling has been performed with a variety of methods over the last decades.
+Many clever tricks have been found that take advantage of certain assumptions about a scene, sometimes limiting what kinds of scenes are possible.
+Keeping a scene static while performing a walkthrough of an indoor area is common.
+Some software-based occlusion culling solutions have been used as well in order to avoid the CPU stalls of hardware occlusion queries.
+
+One visibility culling algorithm uses mathematical properties of convex polyhedral objects to determine visibility on the fly.\cite{large-occluders}
+Coorg and Teller find objects in the scene that serve as large occluders, and avoid testing against smaller objects that wouldn't serve as effective occluders.
+Since the environments are made of collections of convex geometry, it's possible to compute separating and supporting planes from pairs of objects and compute whether or not one object is occluding another.
+The algorithm was developed at a time when the z buffer may be unavailable or done slowly in software, so this algorithm was able to avoid relying on the z buffer.
+
+Portal culling, which was mentioned earlier, is a very effective technique that many engines can easily implement.
+Portals are typically useful in indoor environments and aren't effective in outdoor environments.\cite{Portals-mirrors}
+If the environment is subdivided into zones, only geometry in zones that are determined to be visible gets rendered.
+The camera's initial view frustum gets computed.
+The geometry in the zone the camera is located is then rendered.
+If the geometry of a portal is visible to the camera, a new smaller view frustum spawns off that simulates the view through the portal into the adjacent zone.
+The scene's zones are traversed this way until no more portals are determined to be visible.
+
+\begin{figure}
+\begin{center}
+\includegraphics[width=0.75\textwidth]{Images/Portal-Culling.png}
+\captionfonts
+\caption[Portal Culling]{An example of portal culling at work.  Zones A, B, C, and E are rendered.}
+\label{fig:portal-culling}
+\end{center}
+\end{figure}
+
+Teller finds another way to compute visibility in environments made of convex polyhedral geometry.\cite{Vis-Computations-Densely-Occluded}
+This time the scene is preprocessed ahead of time with his algorithm.
+The algorithm is applied in id Software's idTech 4 engine used in games like Doom 3 and Quake 4.\cite{Doom3-source-review}
+Areas of the environment are subdivided and stored in a BSP tree.
+Portals need to be placed by the level designers in crucial areas like doorways and windows to allow the algorithm to compute zones.
+The areas determined by the algorithm are joined into zones with a flood filling algorithm.
+Solid geometry and artist placed portals determine the bounds of zones.
+Without artist placed portals, Doom 3 renders the entire level rather than only visible rooms.
+In 1992, this algorithm was said to take hours of CPU time, but was able to store the processed scene in a fraction of the space.
+Id software's previous titles, Quake 1 through 3, used to run a similar algorithm offline in a separate utility.
+Artists made levels in a separate tool and converted the levels to a format loadable by the game.
+Doom 3 can now run this algorithm right before loading a level and the process is built right into the game.
+This way the game can ship with the levels in their editable form for people to look at with the built in map editor.
+
+Zang, Manocha, Hudson, and Hoff have developed an algorithm that uses a heirarchy of occlusion maps.\cite{heir-occ-map}
+Occlusion maps are similar to the z buffer.
+In this algorithm a heirarchy of buffers is created, which are basically the z buffer at different levels of detail.
+Occluders are rendered to this buffer.
+Occludees then are tested against the right buffer depending on how big they are on the screen by testing and rasterizing a bounding rectangle.
+An algorithm similar to this was applied in Ubisoft's Splinter Cell Conviction.\cite{spliter}
+They were able to acheive about 20,000 queries every frame on the Xbox 360.
+
+The Frostbite 2 Engine developed by Dice is a great example of modern occlusion culling.\cite{culling-bf}
+This engine effectively supports destructible environments in both indoor and outdoor settings as shown in the game Battlefield 3.
+It shows off the capabilities of modern high end hardware as well as managing to run on dated hardware with a lower spec profile.
+Typically hierarchical data structures such as Octrees, Bounding Volume Hierarchies, or BSP Trees are used for 3D scene management.\cite{CHC, CHCpp, GpuGem-Queries, dpvs}
+However, the developers of Battlefield 3 found they were able to push more performance with a uniform grid.
+Modern parallel computing architectures handle the linear arrays of a grid much better than the branch heavy traversal of the hierarchical structures.\cite{culling-bf}
+The lack of branching creates predictable data access that is cache coherent and allows variaous parallel algorithms to operate more efficiently.
+The visibility culling algorithm relies on artist generated low detail large occluder geometry that is rasterized software-side to a low resolution depth buffer.
+This requires a software rasterizer capable of rendering arbitrary geometry to be implemented.
+Objects such as tanks or soldiers have their bounding rectangle tested against this buffer similarly to how a hardware occlusion query would operate before being queued up for the hardware to render.
+
+CryENGINE 3, used for games like Crysis 2 and Farcry 3, is another modern game engine capable of rendering large indoor and outdoor environments effectively.\cite{cryengine3, Cryengine-culling-explained}
+Cryengine uses what is called a coverage buffer but avoids implementing a full arbitrary geometry rasterizer by reading back the z buffer from the hardware and using it in later frames.
+As the camera moves around, the coverage buffer needs to be adjusted to correspond more closely to how the current frame looks.
+Cryengine reprojects the buffer with the transform of the current camera and then fills in any holes.
+After this, like Frostbite 2, objects' bounding rectangles are rasterized and tested against the contents of the coverage buffer.
+Cryengine also allows for use of portals and occlusion geometry that they refer to as antiportals to further augment the visibulity culling algorithm.
+
+The dPVS algorithm developed by Aila and Miettenen is another similar algorithm capable of rendering large dynamic environments.\cite{dpvs}
+Their system allows for a combination of various occlusion culling algorithms such as portals and queries.
+The scene is organized by a K/D tree.
+This data structure is normally used best in static environments, but this algorithm is able to effectively recompute the structure on the fly.
+They too use a coverage buffer for occlusion queries where the sillhouettes of objects are rasterized.
+Queries are then run against this coverage buffer.
+
+The Coherent Heirarchical Culling algorithm uses the same hardware occlusion queries that this paper uses.\cite{CHC, CHCpp}
+This algorithm allows a scene managed by a Bounding Volume Heirarchy to effectively use queries.
+Temporal coherence is taken advantage of, meaning the results of queries from previous frames are not likely to change.
+As the tree of the bounding volume heirarchy is traversed, the visibility results of nodes are used in later frames.
+Since this is a heirarchy, entire portions of the scene can be culled out for a number of frames.
+They make no mention on whether or not objects noticeably pop in late with this algorithm.
 
 \chapter{Visbility Culling Algorithm}
 \label{visibility-culling-algorithm}
