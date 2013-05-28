@@ -437,7 +437,7 @@ This time the scene is preprocessed ahead of time with his algorithm.
 The algorithm is applied in id Software's idTech 4 engine used in games like Doom 3 and Quake 4.\cite{Doom3-source-review}
 Areas of the environment are subdivided and stored in a BSP tree.
 Portals need to be placed by the level designers in crucial areas like doorways and windows to allow the algorithm to compute zones.
-The areas determined by the algorithm are joined into zones with a flood filling algorithm.
+The algorithm finds mini areas and they are joined into zones with a flood filling algorithm.
 Solid geometry and artist placed portals determine the bounds of zones.
 Without artist placed portals, Doom 3 renders the entire level rather than only visible rooms.
 In 1992, this algorithm was said to take hours of CPU time, but was able to store the processed scene in a fraction of the space.
@@ -510,18 +510,12 @@ They make no mention on whether or not objects noticeably pop in late with this 
 \section{Scene Management}
 \label{scene-management}
 
-\subsection{Uniform Grid}
-\label{uniform-grid}
-
-Typically hierarchical data structures such as Octrees, Bounding Volume Hierarchies, or BSP Trees are used for 3D scene management.\cite{CHC, CHCpp, GpuGem-Queries, dpvs}
-A grid, however, is very easy to keep updated with the contents of a fully dynamic scene.
+This algorithm stores the scene in a uniform grid.
+A grid is very easy to keep updated with the contents of a fully dynamic scene.
 Objects that move around can use their Axis Aligned Bounding Box to determine which cells they need to be tracked in.
 A grid's structure doesn't need to be recomputed as the scene changes in real time like the other static structures would.
-
-Modern parallel computing architectures handle the linear arrays of a grid much better than the branch heavy traversal of the hierarchical structures.\cite{culling-bf}
-The lack of branching creates predictable data access that is cache coherent.
-Modern game engines like Dice's Frostbite 2 use the grid for these reasons.\cite{culling-bf}
-The performance of Battlefield 3 is a good example of the simple uniform grid's effectiveness in managing large dynamic environments.
+There is no branching as the structure is traversed, making it easier to process the scene in one pass with occlusion queries.
+The results of visibility changes in a heirarchical structure would take a few extra frames to propagate, possibly increasing the likelyhood of noticeable popping artifacts.
 
 \subsection{Objects at Cell Boundaries}
 \label{objects-at-cell-boundaries}
@@ -598,7 +592,10 @@ This keeps the correct occluder order and avoids false positives.
 
 \subsection{The Rasterizing Algorithm}
 \label{the-rasterizing-algorithm}
-TODO: should I go into the 3D rasterizing here?  Should I put it in the appendix?
+The 3D convex polygon rasterizing algorithm is optimized enough that it is able to quickly process very dense grids.
+Its implementation is outlined in the appendix.
+It's possible to avoid implementing this algorithm and use a simpler axis aligned box rasterizer.
+In this case cells have to be individually checked to see if they are in the view frustum.
 
 \section{Rendering}
 \label{rendering}
@@ -615,7 +612,7 @@ It would be better to render Tree A, Tree B, then switch to the shader and textu
 The algorithm in this paper avoids this problem and allows objects to be queued up and then sorted by their render state.
 
 The deferred shading renderer used for this project sorts objects first by shader, then textures, then by the instance of mesh.
-This is done in order of which changes cause the worst performance hit for the GPU.
+This is done in order of which changes cause the worst performance hit for the GPU.\cite{d3d10-sys}
 It should also be possible to quickly depth sort the meshes being rendered to avoid some overdraw but the objects are already sorted well enough when the view frustum is rasterized front to back.
 True depth sort is only needed for alpha blended objects.
 
@@ -701,68 +698,431 @@ TODO: make the pseudo code better
 \chapter{Results}
 \label{results}
 
-Here is the results section.
+\section{Environment}
+\label{environment}
 
-LaTeX is a document markup language and document preparation system for the TeX typesetting program.
+The graphics engine was tested on two machines.
+The current implementation doesn't take advantage of multithreading due to the difficulty in trying to have a good multithreaded design while experimenting with different ideas, so the number of cores isn't as much a deciding factor in performance as the speed of the processor itself.
 
-It is widely used by mathematicians, scientists, philosophers, engineers, and scholars in academia and the commercial world, and by others as a primary or intermediate format (e.g. translating DocBook and other XML-based formats to PDF) because of the quality of typesetting achievable by TeX. It offers programmable desktop publishing features and extensive facilities for automating most aspects of typesetting and desktop publishing, including numbering and cross-referencing, tables and figures, page layout and bibliographies.
+One system is a custom built desktop tower with an Intel i5-750 processor running at 2.67 Ghz and is running Windows 8 64 bit.
+It has 6 Gigabytes of RAM.
+The graphics card is an EVGA Geforce GTX 480 with Geforce 311.06 drivers installed and 1.5 Gigabytes of video memory.
 
-LaTeX is intended to provide a high-level language to access the power of TeX. LaTeX essentially comprises a collection of TeX macros, and a program to process LaTeX documents. Since TeX's formatting commands are very low-level, it is usually much simpler for end-users to use LaTeX.
+The other system is a Toshiba Satellite A505-S6035 laptop with an Intel i7-Q720 processor running at 1.60Ghz and is also running Windows 8 64 bit.
+It has 4 Gigabytes of RAM.
+The GPU is a Geforce GT 330M with Geforce 310.90 drivers installed and 1 Gigabyte of video memory.
 
-LaTeX was originally written in 1984 by Leslie Lamport at SRI International and has become the dominant method for using TeX—few people write in plain TeX anymore.
+SDL 2.0 revision 7140 is used as the window management library.
+The glm library was used for all of the 3D math.
+DevIL was used to help load various texture formats.
+The engine runs with OpenGL 3.3 features while also using deprecated features like immediate mode to make it easier to draw debug visualizations.
+GLEW 1.9.0 was used to help with the OpenGL function bindings.
+The tested executable is built for 64 bit using Visual Studio 2012.
 
-LaTeX is based on the idea that authors should be able to focus on the meaning of what they are writing, without being distracted by the visual presentation of the information. In preparing a LaTeX document, the author specifies the logical structure using familiar concepts such as chapter, section, table, figure, etc., and lets the LaTeX system worry about the presentation of these structures. It therefore encourages the separation of layout from content, while still allowing manual typesetting adjustments where needed. This is similar to the mechanism by which many word processors allow styles to be defined globally for an entire document, or the CSS mechanism used by HTML.
+A limited deferred shading renderer is used to display the scenes.
+The renderer is capable of performing normal mapping, specular highlights, and rendering only solid geometry.
+It's able to light the scene with point lights, spot lights, and a directional volume light for lighting up large areas.
+More features are planned for the future.
 
-LaTeX can be arbitrarily extended by using the underlying macro language to develop custom formats. Such macros are often collected into packages which are available to address special formatting issues such as complicated mathematical content or graphics. In addition, there are numerous commercial implementations of the entire TeX system, including LaTeX, to which vendors may add extra features like additional typefaces and telephone support. LyX is a free visual document processor that uses LaTeX for a back-end. TeXmacs is a free, WYSIWYG editor with similar functionalities as LaTeX, but a different typesetting engine.
+\section{Test Scenes}
+\label{test-scenes}
 
-A number of popular commercial desktop publishing systems use modified versions of the original TeX typesetting engine. The recent rise in popularity of XML systems and the demand for large-scale batch production of publication-quality typesetting from such sources has seen a steady increase in the use of LaTeX.
+The engine treats 1 unit as 1 meter.
+The scenes were designed keeping in mind the average height of a person being 1.7 meters or units.
+3DS Max 2012 and a custom Max Script were used for exporting the scenes into a format readable by the engine.
 
+The first scene is an indoor scene with tight corridors called The Grid.
+The objects in this scene aren't textured due to time constraints, so they are covered in a high specular white shiny material with all the color being derived from colorful lighting.
+The scene only makes use of point lights, causing a large number of lights to be needed to light up the interior brightly.
+It's an area designed and duplicated in a grid like pattern to simulate a fairly large and sprawling indoor environment.
+This scene is approximately 130 x 12 x 210 units in size.
+
+The second scene is a much larger area called Teapot Graveyard.
+It combines detailed indoor environments similar to The Grid with large outdoor areas.
+This scene makes use of all available features of the renderer.
+All objects are textured, causing extra stress to the deferred shading renderer by making it use more demanding shaders and sorting by more render states.
+The textures are borrowed from the Perfected Doom 3 mod by Vgames, who made high resolution versions of textures for id Software's game Doom 3.\cite{Perf-Doom3}
+A large number of point lights and spot lights are used for the hangar area.
+The outdoor area is a combination of several directional volume lights and randomly placed point lights.
+There is currently no heightmap terrain rendering system in place, so the terrain is composed of a set of meshes from a model that was split into 100 peices as a temporary solution.
+This scene is approximately 1250 x 750 x 1250 units in size.
+
+\begin{figure}
+\begin{center}
+\includegraphics[width=\textwidth]{Images/Grid-Overview.jpg}
+\captionfonts
+\caption[The Grid Map Overview]{Overview of The Grid.}
+\label{fig:grid-overview}
+
+\includegraphics[width=\textwidth]{Images/GridHalls.jpg}
+\captionfonts
+\caption[Halls of the Grid]{A view of the outer hallways of The Grid.}
+\label{fig:grid-halls}
+\end{center}
+\end{figure}
+
+\begin{figure}
+\begin{center}
+\includegraphics[width=\textwidth]{Images/GridInnerSanctum.jpg}
+\captionfonts
+\caption[Grid Inner Sanctum]{A view of the inner sanctum center area.}
+\label{fig:grid-inner-sanctum}
+
+\includegraphics[width=\textwidth]{Images/GridShaft.jpg}
+\captionfonts
+\caption[Grid Shaft]{A view of the vertical shaft joining the two floors of The Grid.}
+\label{fig:grid-shaft}
+
+\end{center}
+\end{figure}
+
+
+\begin{figure}
+\begin{center}
+\includegraphics[width=\textwidth]{Images/GraveyardOverview.jpg}
+\captionfonts
+\caption[Teapot Graveyard Overview]{Overview of Teapot Graveyard.}
+\label{fig:fraveyard-overview}
+
+\includegraphics[width=\textwidth]{Images/TeapotGraveyard.jpg}
+\captionfonts
+\caption[Teapot Graveyard]{A view of the outdoor portion of the Teapot Graveyard map.}
+\label{fig:teapot-graveyard}
+\end{center}
+\end{figure}
+
+\begin{figure}
+\begin{center}
+\includegraphics[width=\textwidth]{Images/HangarEntrance.jpg}
+\captionfonts
+\caption[Hangar Entrance]{Entrance into the Hangar area.}
+\label{fig:hangar-entrance}
+
+\includegraphics[width=\textwidth]{Images/Hangar.jpg}
+\captionfonts
+\caption[Hangar]{A view of the underground Hangar of the Teapot Graveyard.}
+\label{fig:hangar}
+
+\end{center}
+\end{figure}
+
+\begin{figure}
+\begin{center}
+\includegraphics[width=\textwidth]{Images/HallCorner.jpg}
+\captionfonts
+\caption[Hall Corner]{Side hallways of the Hangar in Teapot Graveyard.}
+\label{fig:hall-corner}
+
+\end{center}
+\end{figure}
+
+\section {Metrics}
+\label{metrics}
+
+The most useful metrics for this engine are the framerate and the perceived popping artifacts.
+The framerate is easily measurable and displayed with a graph that makes it easy to find causes of performance drops as the engine is running.
+The measurement of popping artifacts directly would negatively affect performance.
+A method for computing when an object or cell should be visible versus the amount of time it took for it to become visible would be difficult with the current implementation.
+Knowing when an object should be visible is part of the algorithm in the first place, and the query cap causes a slight delay in visibility time of objects farther away.
+As a result, measurement of popping artifacts is measured objectively.
+The very core of this algorithm is to take advantage of the fact that people would not notice objects popping in too much, so this is the perfect way to measure the effectiveness of the algorithm.
+(TODO, in the short amount of time I have, find a group of people to test my engine and report how much they noticed objects popping in.  So far I tested on myself only)
+X people were asked to try running the engine with various settings and reported the degree of perceived noticeable pop in as either Not Noticeable, A Tiny Bit Noticeable, Sometimes Noticeable, and Very Noticeable.
+
+%\begin{figure}
+%\begin{center}
+%\includegraphics[width=\textwidth]{Images/PerfGraph.jpg}
+%\captionfonts
+%\caption[Performance Graph]{A graph showing performance statistics on the fly.}
+%\label{fig:performance-graph}
+%\end{center}
+%\end{figure}
+
+The variables are the grid dimensions, maximum queries per frame, validity duration of a visibility query, validity duration of an invisibility query, and the growth of duration for the two query results due to the number of frames in a row the query cap has been reached.
+
+\section {Data}
+\label{data}
+
+\subsection {The Grid Map on GTX 480 Desktop PC}
+\label{the-grid-gtx-480}
 
 \begin{table}
 \begin{center}
-
 \begin{tabular}{|c|c|c|c|c|c|c|}
 \hline 
-&
-\multicolumn{2}{c|}{Some Data}&
-&
-\multicolumn{2}{c|}{Some More Data}&
+&\multicolumn{2}{c|}{Visibility}&\multicolumn{2}{c|}{Invisibility}&&
+\tabularnewline
+Max Queries&Duration&Growth&Duration&Growth&FPS&Pop-in
 \tabularnewline
 \hline
-\hline 
-&  Hi-Res&  Lo-Res&  Reduction&  Hi-Res&  Lo-Res&  Speedup
+1000 & 15& 4& 1& 1& 60& High
 \tabularnewline
-\hline 
-Row Data A &  225,467&  43,850&  80.6\%&  360&  90&  4.0
+& 20& 6& 2& 1& 60& High
 \tabularnewline
-\hline 
-Row Data B &  225,467&  16,388&  92.7\%&  360&  26&  13.8
+& 30& 8& 2& 2& 60& High
+\tabularnewline \hline
+2000 & 15& 4& 1& 1& 60& Medium
 \tabularnewline
-\hline 
+& 20& 6& 2& 1& 60& Medium
+\tabularnewline
+& 30& 8& 2& 2& 60& Medium
+\tabularnewline \hline
+3000 & 15& 4& 1& 1& 60& Low
+\tabularnewline
+& 20& 6& 2& 1& 60& Low
+\tabularnewline
+& 30& 8& 2& 2& 60& Low
+\tabularnewline \hline 
+4000 & 15& 4& 1& 1& 60& Unnoticeable
+\tabularnewline 
+& 20& 6& 2& 1& 60& Unnoticeable
+\tabularnewline
+& 30& 8& 2& 2& 60& Unnoticeable
+\tabularnewline \hline 
 \end{tabular}
-
-
 \captionfonts
-\caption[Performance data]{Here is some performance data for the system.}
-\label{table:performance}
+\caption[Performance for The Grid]{Cell dimensions: 5x12x5\\Number of Cells: 26x2x42}
+\label{table:the-grid-performance-a}
 \end{center}
 \end{table}
 
+\begin{table}
+\begin{center}
+\begin{tabular}{|c|c|c|c|c|c|c|}
+\hline 
+&\multicolumn{2}{c|}{Visibility}&\multicolumn{2}{c|}{Invisibility}&&
+\tabularnewline
+Max Queries&Duration&Growth&Duration&Growth&FPS&Pop-in
+\tabularnewline
+\hline
+1000 & 15& 4& 1& 1& 60& High
+\tabularnewline
+& 20& 6& 2& 1& 60& High
+\tabularnewline
+& 30& 8& 2& 2& 60& High
+\tabularnewline \hline
+2000 & 15& 4& 1& 1& 60& Medium
+\tabularnewline
+& 20& 6& 2& 1& 60& Medium
+\tabularnewline
+& 30& 8& 2& 2& 60& Medium
+\tabularnewline \hline
+3000 & 15& 4& 1& 1& 60& Low
+\tabularnewline
+& 20& 6& 2& 1& 60& Low
+\tabularnewline
+& 30& 8& 2& 2& 60& Low
+\tabularnewline \hline 
+4000 & 15& 4& 1& 1& 60& Unnoticeable
+\tabularnewline 
+& 20& 6& 2& 1& 60& Unnoticeable
+\tabularnewline
+& 30& 8& 2& 2& 60& Unnoticeable
+\tabularnewline \hline 
+\end{tabular}
+\captionfonts
+\caption[Performance for The Grid]{The Grid map.\\Cell dimensions: 5x12x5\\Number of Cells: 26x2x42}
+\label{table:the-grid-performance-b}
+\end{center}
+\end{table}
 
-LaTeX is a document markup language and document preparation system for the TeX typesetting program.
+\begin{table}
+\begin{center}
+\begin{tabular}{|c|c|c|c|c|c|c|}
+\hline 
+&\multicolumn{2}{c|}{Visibility}&\multicolumn{2}{c|}{Invisibility}&&
+\tabularnewline
+Max Queries&Duration&Growth&Duration&Growth&FPS&Pop-in
+\tabularnewline
+\hline
+1000 & 15& 4& 1& 1& 60& High
+\tabularnewline
+& 20& 6& 2& 1& 60& High
+\tabularnewline
+& 30& 8& 2& 2& 60& High
+\tabularnewline \hline
+2000 & 15& 4& 1& 1& 60& Medium
+\tabularnewline
+& 20& 6& 2& 1& 60& Medium
+\tabularnewline
+& 30& 8& 2& 2& 60& Medium
+\tabularnewline \hline
+3000 & 15& 4& 1& 1& 60& Low
+\tabularnewline
+& 20& 6& 2& 1& 60& Low
+\tabularnewline
+& 30& 8& 2& 2& 60& Low
+\tabularnewline \hline 
+4000 & 15& 4& 1& 1& 60& Unnoticeable
+\tabularnewline 
+& 20& 6& 2& 1& 60& Unnoticeable
+\tabularnewline
+& 30& 8& 2& 2& 60& Unnoticeable
+\tabularnewline \hline 
+\end{tabular}
+\captionfonts
+\caption[Performance for The Grid]{The Grid map.\\Cell dimensions: 5x12x5\\Number of Cells: 26x2x42}
+\label{table:the-grid-performance-c}
+\end{center}
+\end{table}
 
-It is widely used by mathematicians, scientists, philosophers, engineers, and scholars in academia and the commercial world, and by others as a primary or intermediate format (e.g. translating DocBook and other XML-based formats to PDF) because of the quality of typesetting achievable by TeX. It offers programmable desktop publishing features and extensive facilities for automating most aspects of typesetting and desktop publishing, including numbering and cross-referencing, tables and figures, page layout and bibliographies.
+\begin{table}
+\begin{center}
+\begin{tabular}{|c|c|c|c|c|c|c|}
+\hline 
+&\multicolumn{2}{c|}{Visibility}&\multicolumn{2}{c|}{Invisibility}&&
+\tabularnewline
+Max Queries&Duration&Growth&Duration&Growth&FPS&Pop-in
+\tabularnewline
+\hline
+1000 & 15& 4& 1& 1& 60& High
+\tabularnewline
+& 20& 6& 2& 1& 60& High
+\tabularnewline
+& 30& 8& 2& 2& 60& High
+\tabularnewline \hline
+2000 & 15& 4& 1& 1& 60& Medium
+\tabularnewline
+& 20& 6& 2& 1& 60& Medium
+\tabularnewline
+& 30& 8& 2& 2& 60& Medium
+\tabularnewline \hline
+3000 & 15& 4& 1& 1& 60& Low
+\tabularnewline
+& 20& 6& 2& 1& 60& Low
+\tabularnewline
+& 30& 8& 2& 2& 60& Low
+\tabularnewline \hline 
+4000 & 15& 4& 1& 1& 60& Unnoticeable
+\tabularnewline 
+& 20& 6& 2& 1& 60& Unnoticeable
+\tabularnewline
+& 30& 8& 2& 2& 60& Unnoticeable
+\tabularnewline \hline 
+\end{tabular}
+\captionfonts
+\caption[Performance for Teapot Graveyard]{Teapot Graveyard map.\\Cell dimensions: 5x12x5\\Number of Cells: 26x2x42}
+\label{table:teapot-performance-a}
+\end{center}
+\end{table}
 
-LaTeX is intended to provide a high-level language to access the power of TeX. LaTeX essentially comprises a collection of TeX macros, and a program to process LaTeX documents. Since TeX's formatting commands are very low-level, it is usually much simpler for end-users to use LaTeX.
+\begin{table}
+\begin{center}
+\begin{tabular}{|c|c|c|c|c|c|c|}
+\hline 
+&\multicolumn{2}{c|}{Visibility}&\multicolumn{2}{c|}{Invisibility}&&
+\tabularnewline
+Max Queries&Duration&Growth&Duration&Growth&FPS&Pop-in
+\tabularnewline
+\hline
+1000 & 15& 4& 1& 1& 60& High
+\tabularnewline
+& 20& 6& 2& 1& 60& High
+\tabularnewline
+& 30& 8& 2& 2& 60& High
+\tabularnewline \hline
+2000 & 15& 4& 1& 1& 60& Medium
+\tabularnewline
+& 20& 6& 2& 1& 60& Medium
+\tabularnewline
+& 30& 8& 2& 2& 60& Medium
+\tabularnewline \hline
+3000 & 15& 4& 1& 1& 60& Low
+\tabularnewline
+& 20& 6& 2& 1& 60& Low
+\tabularnewline
+& 30& 8& 2& 2& 60& Low
+\tabularnewline \hline 
+4000 & 15& 4& 1& 1& 60& Unnoticeable
+\tabularnewline 
+& 20& 6& 2& 1& 60& Unnoticeable
+\tabularnewline
+& 30& 8& 2& 2& 60& Unnoticeable
+\tabularnewline \hline 
+\end{tabular}
+\captionfonts
+\caption[Performance for Teapot Graveyard]{Teapot Graveyard map.\\Cell dimensions: 5x12x5\\Number of Cells: 26x2x42}
+\label{table:teapot-performance-b}
+\end{center}
+\end{table}
 
-LaTeX was originally written in 1984 by Leslie Lamport at SRI International and has become the dominant method for using TeX—few people write in plain TeX anymore.
+\begin{table}
+\begin{center}
+\begin{tabular}{|c|c|c|c|c|c|c|}
+\hline 
+&\multicolumn{2}{c|}{Visibility}&\multicolumn{2}{c|}{Invisibility}&&
+\tabularnewline
+Max Queries&Duration&Growth&Duration&Growth&FPS&Pop-in
+\tabularnewline
+\hline
+1000 & 15& 4& 1& 1& 60& High
+\tabularnewline
+& 20& 6& 2& 1& 60& High
+\tabularnewline
+& 30& 8& 2& 2& 60& High
+\tabularnewline \hline
+2000 & 15& 4& 1& 1& 60& Medium
+\tabularnewline
+& 20& 6& 2& 1& 60& Medium
+\tabularnewline
+& 30& 8& 2& 2& 60& Medium
+\tabularnewline \hline
+3000 & 15& 4& 1& 1& 60& Low
+\tabularnewline
+& 20& 6& 2& 1& 60& Low
+\tabularnewline
+& 30& 8& 2& 2& 60& Low
+\tabularnewline \hline 
+4000 & 15& 4& 1& 1& 60& Unnoticeable
+\tabularnewline 
+& 20& 6& 2& 1& 60& Unnoticeable
+\tabularnewline
+& 30& 8& 2& 2& 60& Unnoticeable
+\tabularnewline \hline 
+\end{tabular}
+\captionfonts
+\caption[Performance for Teapot Graveyard]{Teapot Graveyard map.\\Cell dimensions: 5x12x5\\Number of Cells: 26x2x42}
+\label{table:teapot-performance-c}
+\end{center}
+\end{table}
 
-LaTeX is based on the idea that authors should be able to focus on the meaning of what they are writing, without being distracted by the visual presentation of the information. In preparing a LaTeX document, the author specifies the logical structure using familiar concepts such as chapter, section, table, figure, etc., and lets the LaTeX system worry about the presentation of these structures. It therefore encourages the separation of layout from content, while still allowing manual typesetting adjustments where needed. This is similar to the mechanism by which many word processors allow styles to be defined globally for an entire document, or the CSS mechanism used by HTML.
+\section{Conclusions}
+\label{conclusions}
+These results show that a maximum of about 3000 to 4000 queries gives the best balance between performance and perceived object pop in.
+The large outdoor Teapot Graveyard map benefits from a denser grid when exploring the underground hangar area.
+This section contains tight indoor corridors, and having a denser grid allows the engine to avoid rendering more objects behind walls.
+The outdoor portion doesn't show benefit from a denser grid, so maps that are exclusively outdoors should stick to using sparser grids.
 
-LaTeX can be arbitrarily extended by using the underlying macro language to develop custom formats. Such macros are often collected into packages which are available to address special formatting issues such as complicated mathematical content or graphics. In addition, there are numerous commercial implementations of the entire TeX system, including LaTeX, to which vendors may add extra features like additional typefaces and telephone support. LyX is a free visual document processor that uses LaTeX for a back-end. TeXmacs is a free, WYSIWYG editor with similar functionalities as LaTeX, but a different typesetting engine.
+The indoor map, The Grid, doesn't hit the query maximum as much.
+Even with a more dense grid than Teapot Graveyard, there are less grid cells to rasterize since the map dimensions are smaller.
+This map tends to keep up a high framerate at all times, showing how well this algorithm performs in the kinds of environments that are usually rendered with portal culling and other static indoor environment techniques.
 
-A number of popular commercial desktop publishing systems use modified versions of the original TeX typesetting engine. The recent rise in popularity of XML systems and the demand for large-scale batch production of publication-quality typesetting from such sources has seen a steady increase in the use of LaTeX.
+These tests have shown that the visibility culling algorithm presented in this paper is effective for both indoor and outdoor environments.
+Although hardware occlusion queries can cause CPU stalls, using them wisely can be very beneficial.
+By taking advantage of spatial and temporal coherence, we were able to push performance out of an often overlooked feature of the graphics pipeline.
 
+\chapter{Future Work}
+\label{future-work}
+As mentioned earlier, the current deferred shading renderer is limited to rendering only solid objects.
+Static multimaterial triangle meshes are the only type of object renderable, which was enough to create the detailed scenes used for testing the algorithm.
+Transparent objects would require a forward shading renderer.
+The approximate front to back frustum traversal algorithm would work great for sorting alpha blended objects in the correct order since only occlusion order is needed, not true depth order.
+Skeletal animations, particle systems, shadows, and various post processing effects would add even more stress to the engine, giving more opportunity to find ways to optimize the algorithm.
+
+Cascaded shadow maps are often used for large outdoor environments to cast shadows from sunlight or other global outdoor sources.\cite{ms-cascaded-shadow}
+The paper mentioned earlier a method for supporting multiple viewports for split screen multiplayer.
+A viewport can be created for the point of view of the outdoor global light source since a large portion of the scene needs to be rendered to the shadow map.
+For smaller light volumes, it's best to avoid using the hardware occlusion queries and to just render objects that are within the view frustum from the light's point of view.
+The bookkeeping required for each viewport that uses this algorithm would be impractical for that many lights.
+
+The graphics engine was originally a fully featured multi threaded game engine.
+It was driven by a combination of Nvidia PhysX 3.0 and Intel Thread Building Blocks.
+Those features were stripped out for the current implementation in favor of a single threaded graphics only engine in order to avoid being distracted by other features.
+Seeing a fully functional world with moving objects being driven by this graphics engine would be a great stress test.
+Being in an action packed world would likely reduce how noticeable popping is.
+The CPU stall from gathering query results from last frame mentioned earlier would be less impactful since the engine has more work to do.
+The query results would likely be ready by the time the engine is done updating the rest of the game.
+There may also be room for parallelizing some portions of this algorithm, such as the sorting of alpha blended objects mentioned earlier.
 
 % ------------- End main chapters ----------------------
 
