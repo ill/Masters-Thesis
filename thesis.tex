@@ -233,6 +233,13 @@ The engine won't necessarily be smart enough to know how to best place a portal 
 The zones divided by portals are often static as well and the engine would need to somehow figure out how to create new zones on the fly.
 Portals can also be very tedious for the level designers to keep track of as they are constantly iterating on the design of a level.
 
+Occluder geometry is also often used in modern game engines.
+Modelers can make a low detail version of a mesh.\cite{culling-bf}
+The engine can then do ray intersection tests against all triangles in this mesh to test if some object is behind the geometry.\cite{Cryengine-culling-explained}
+Engines that do software occlusion culling render these meshes CPU side rather than rendering the detailed geometry the GPU powered hardware occlusion queries would render.
+Making these low resolution meshes that are used specifically for occlusion culling creates extra work for modelers.
+If an object is destructible, the low resolution mesh must somehow be deformable along with the high resolution mesh it represents.
+
 \begin{figure}
 \begin{center}
 \includegraphics[width=0.75\textwidth]{Images/OccluderGeomFig.jpg}
@@ -241,13 +248,6 @@ Portals can also be very tedious for the level designers to keep track of as the
 \label{fig:occluder-geometry}
 \end{center}
 \end{figure}
-
-Occluder geometry is also often used in modern game engines.
-Modelers can make a low detail version of a mesh.\cite{culling-bf}
-The engine can then do ray intersection tests against all triangles in this mesh to test if some object is behind the geometry.\cite{Cryengine-culling-explained}
-Engines that do software occlusion culling render these meshes CPU side rather than rendering the detailed geometry the GPU powered hardware occlusion queries would render.
-Making these low resolution meshes that are used specifically for occlusion culling creates extra work for modelers.
-If an object is destructible, the low resolution mesh must somehow be deformable along with the high resolution mesh it represents.
 
 \section{Our Contribution}
 \label{our-contribution}
@@ -295,9 +295,9 @@ If the test passes early on, the fragment can be rasterized if it passes other t
 
 \begin{figure}
 \begin{center}
-\includegraphics{Images/Z_buffer.png}
+\includegraphics[width=0.5\textwidth]{Images/Z_buffer.png}
 \captionfonts
-\caption[Z Buffer]{TODO: scale this nicely}
+\caption[Z Buffer]{Example of a Z Buffer}
 \label{fig:z-buffer}
 \end{center}
 \end{figure}
@@ -483,7 +483,7 @@ Cryengine also allows for use of portals and occlusion geometry that they refer 
 
 \begin{figure}
 \begin{center}
-\includegraphics[width=\textwidth]{Images/CryCoverage.jpg}
+\includegraphics[width=0.5\textwidth]{Images/CryCoverage.jpg}
 \captionfonts
 \caption[Cry Engine Coverage Buffer]{The coverage buffer used in CryENGINE 3.  The red portions are the holes after reprojecting from previous frames to the current camera angle. (TODO: cite Secrets of Cryengine 3 Pres)}
 \label{fig:cry-coverage}
