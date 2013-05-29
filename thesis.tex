@@ -160,29 +160,71 @@ It also requires very little work from the artists who design the scenes since n
 \label{real-time-graphics}
 
 Real time computer graphics are needed for CAD applications, simulations, video games, and even for just displaying the user interface of an operating system.
-Computer graphics can be non-real time, like when doing CGI for a movie.
-Each frame can take hours to render, and the result is a very photorealistic image that looks like it's part of the movie itself.
+Computer graphics can be non-real time, for example when doing CGI for a movie.
+Each frame can take hours to render, and the result is a very photorealistic image that looks like it is part of the movie itself.
 Millions of frames are generated only for each still frame to be visible for a fraction of a second until the next frame to give the illusion of motion.
 Real time graphics also display a frame for only a fraction of a second but are rendered on the fly right as the user is controlling the application.
-This means the computer can't sit there for hours rendering a frame, it has 33.33 milliseconds if trying to render at 30 frames per second.
+This means the computer only has 33.33 milliseconds if trying to render at 30 frames per second.
 Most computer monitors update at 60 Hz so real time graphics typically strive for 60 FPS giving an even smoother experience, and this means the computer now only has 16.66 milliseconds to render a frame.
 Maintining a smooth, also known as interactive, framerate is important for ensuring the user has a good experience controlling the application.\cite{Interactive}
+
+Real time graphics are a challenge because a scene may need to be rendered with the quality that looks as close to non-real time graphics as possible like the scene from Battlefield 3 in figure \ref{fig:bf3}.
+Many calculations need to be performed to produce the resulting geometry and lighting for a frame.
+Photorealistic real time graphics get away with many shortcuts to look as real as possible.
+The result may not be completely realistic and doesn't simulate the physics of light as accurately as non-real time graphics, but the resulting image still looks good.
+It's possible to have non-photo realistic graphics as well like the character from Borderlands 2 in figure \ref{fig:borderlands2}, but those too require a large amount of processing power.
+
+\begin{figure}
+\begin{center}
+\includegraphics[width=\textwidth]{Images/BF3.jpg}
+\captionfonts
+\caption[Battlefield 3]{The photorealistic real time graphics of Battlefield 3. (TODO: make these images side by side and figure out how to cite them)}
+\label{fig:bf3}
+\includegraphics[width=\textwidth]{Images/Borderlands_2.png}
+\captionfonts
+\caption[Borderlands 2]{The comic book style of Borderlands 2.}
+\label{fig:borderlands2}
+\end{center}
+\end{figure}
+
+\section{The Power of Graphics Processing Units}
+\label{gpu}
+Computers have dedicated Graphics Processing Units(GPU) to help with rendering these images.
+Modern GPUs are built to perform a single operation on large amounts of data in parallel, which makes them useful for non-graphics applications as well with the help of tools like CUDA.\cite{FermiArch}
+The graphics pipeline of current GPUs is built to work with triangles.\cite{d3d11-pipeline}
+Geometry is represented by a series of vertices making up the triangles.
+The GPU then puts the geometry through various stages where all of the vertices are transformed from 3D world space to 2D screen space, and are then rasterized to the screen.
+There are large amounts of vertices and large amounts of pixels to be rasterized.
+The GPU runs a single algorithm at a time on these large amounts of data in parallel.
+This is why modern hardware can render many triangles with relative ease.
+For example, the dPVS paper has one scene displaying approximately 180,000 triangles at about 68 FPS.\cite{dpvs}
 
 \section{Visibility Culling}
 \label{visibility-culling}
 
 Modern graphics hardware is becoming better and better at rendering large detailed environments in real time.
-Games like Rage, Crysis, Skyrim, Battlefield 3, Just Cause 2, and Grand Theft Auto have maps on an epic scale with drawing distances of several kilometers.
+Games like Rage by idSoftware, Battlefield 3 by Dice, Crysis by Crytek, and Just Cause 2 by Avalanche Studios, have maps on an large scale with drawing distances of several kilometers.
 These kinds of environments are achievable by avoiding drawing as much of the world as possible.\cite{heir-occ-map, large-occluders, Vis-Computations-Densely-Occluded, Portal-culling, Cryengine-culling-explained, Portals-mirrors, dpvs, cryengine3, culling-bf, CHC, CHCpp}
-This is the job of a visibility culling algorithm.  It's relatively easy to avoid drawing portions of the scene that aren't even in the camera's field of view with view frustum culling.
+This is the job of a visibility culling algorithm.
+The scene is viewed through a virtual camera.
+Objects visible to the camera fit within the frustum as shown in figure \ref{fig:frustum}.
+It's relatively easy to avoid drawing portions of the scene that aren't in the camera's field of view with view frustum culling by checking if the object is inside this frustum.
+(TODO: cite: http://www.lighthouse3d.com/tutorials/view-frustum-culling/)
 If a camera is looking at a wall or a mountain in the distance, it's also best to avoid drawing things behind those objects.
-With large scenes, it's possible that only about 1\% of it has to be rendered.
+Figuring out that objects are behind other objects in real time is a challenge but can save many unnecessary draw calls to the GPU.
 
-The GPU is very good at drawing geometry.
-Modern hardware can render many triangles with relative ease.
-For example, the dPVS paper has one scene displaying approximately 180,000 triangles at about 68 FPS.\cite{dpvs}
-It's perfectly fine for the algorithm to have some false positives when rendering a few objects that are actually not visible.
-This would just cause a negligible performance drop that the hardware can just brush off.\cite{large-occluders}
+\begin{figure}
+\begin{center}
+\includegraphics[width=0.5\textwidth]{Images/frustum.png}
+\captionfonts
+\caption[View Frustum]{A camera and its view frustum. A frustum is a pyramid with its top cut off. Objects within the frustum are visible.(TODO cite:http://www.pcmag.com/encyclopedia/term/61771/viewing-frustum)}
+\label{fig:frustum}
+\end{center}
+\end{figure}
+
+A visibility culling algorithm should do its best to determine which objects are not visible to the camera.
+The algorithm may generate some false positives and determine that a few objects are visible when they really aren't.
+Since the GPU is able to render geometry very quickly, a few extra objects will just cause a negligible performance drop.\cite{large-occluders}
 The visual quality starts to suffer if objects go missing that should actually be there, so false negatives on visibility should be avoided.
 Most of the visibility culling work happens on the CPU while the GPU does all the rendering.
 If the CPU is doing too much work finding which objects the GPU shouldn't render, the performance may be worse than if there is no occlusion culling algorithm in the first place.
@@ -191,12 +233,11 @@ A good algorithm must strike the perfect balance where the CPU isn't working too
 \section{Dynamic Environments}
 \label{dynamic-environments}
 
-Static environments of the past used prebaking steps to compute things like lighting and visibility.
+Static environments of the past used prebaking steps to compute expensive operations such as lighting and visibility.
 Nowadays more is possible with fully destructible environments and WYSIWYG level editors built right into the game.
 Environments can be made out of modular set pieces and put together like lego blocks.
 Figures \ref{fig:hangar-view} and \ref{fig:hangar-peices} show an example.
 A wall, column, railing, ladder, or tree may be reused many times in the level, saving artists a lot of work as well as keeping memory down due to loading in one resource and reusing it many times.
-This will make the engine work with a mesh soup.
 
 \begin{figure}
 \begin{center}
@@ -210,6 +251,7 @@ This will make the engine work with a mesh soup.
 \label{fig:hangar-peices}
 \end{center}
 \end{figure}
+
 While designing levels, the artists would work with these objects by throwing in new ones, moving them around, and deleting them.
 The level editor's performance can be greatly increased if it uses a real time visibility culling  algorithm.
 In a game with destructible environments, these same objects can now be moved around and destroyed on the fly.
@@ -220,7 +262,8 @@ This lets artists see exactly how the environment looks as if they were currentl
 \section{Artist Placed Hint Objects}
 \label{artist-placed-hint-objects}
 
-Sometimes an algorithm can't figure out the best way to perform visibility culling in every situation so artists need to place special objects.
+Sometimes an algorithm can't figure out the best way to perform visibility culling in every situation so artists need to place hint objects.
+Hint objects allow an engine to avoid making calculations since the information is given by the designer.
 This creates a lot of extra work for the artists and can be really tedious.
 Artists now need to be educated on the technical inner workings of the engine so they can place the hint objects in the best way.
 Even then, artists may still not do it the best way.
@@ -234,7 +277,7 @@ The zones divided by portals are often static as well and the engine would need 
 Portals can also be very tedious for the level designers to keep track of as they are constantly iterating on the design of a level.
 
 Occluder geometry is also often used in modern game engines.
-Modelers can make a low detail version of a mesh.\cite{culling-bf}
+Modelers can make a low detail version of a mesh as shown in figure \ref{fig:occluder-geometry}.\cite{culling-bf}
 The engine can then do ray intersection tests against all triangles in this mesh to test if some object is behind the geometry.\cite{Cryengine-culling-explained}
 Engines that do software occlusion culling render these meshes CPU side rather than rendering the detailed geometry the GPU powered hardware occlusion queries would render.
 Making these low resolution meshes that are used specifically for occlusion culling creates extra work for modelers.
@@ -253,7 +296,7 @@ If an object is destructible, the low resolution mesh must somehow be deformable
 \label{our-contribution}
 This paper presents a simple high performing visibility culling algorithm that any 3D engine can integrate.
 It allows rendering of large outdoor worlds that are seamlessly combined with detailed indoor architecture.
-It requires hardware that supports occlusion queries, which have been available since about 2003.\cite{GpuGem-Queries}
+It requires hardware that supports occlusion queries which allow the GPU to report how many pixels of an object aren't occluded by other objects.\cite{GpuGem-Queries}
 
 This algorithm avoids the added complexity of a software rasterizer.
 Similar algorithms use software occlusion queries in order to avoid the delay when retrieving hardware occlusion query results.\cite{culling-bf}
@@ -544,7 +587,8 @@ The work done by the CPU checking all objects in a cell will cause a higher perf
 This algorithm allows for large scenes with fine enough grids that there will usually be very few wasted objects compared to the immense number of objects that do get rendered.
 
 The cells in the grid should be traversed front to back relative to the view.
-This way objects closer to the camera get rendered to the z buffer before objects in the back do.
+Figure \ref{fig:vf-and-occluders} shows a top down view of a scene.
+Objects closer to the camera get rendered to the z buffer before objects in the back do.
 Cells farther from the camera get tested against the objects in front that are potentially occluding them since they are in the z buffer.
 
 \begin{figure}
@@ -557,12 +601,22 @@ Cells farther from the camera get tested against the objects in front that are p
 \end{figure}
 
 A true front to back traversal of a grid is very difficult to do well.
-One attempt involved traversing out with rays from the center and stopping the traversal when reaching an occluded cell or the far plane.
-This method never made it past the paper planning stage.
+One attempt involved traversing out with rays from the center and stopping the traversal when reaching an occluded cell or the far plane as shown in figure \ref{fig:vf-ray-traversal}.
+A 3D DDA line rasterizing algorithm would be used to traverse the cells along a ray.
+This method was rejected early on.
 There was a lot of difficulty in figuring out the best way to align the rays so that duplicate cell traversals were minimized and absolutely no cells were ever missed.
 
+\begin{figure}
+\begin{center}
+\includegraphics[width=\textwidth]{Images/ray-traversal.pdf}
+\captionfonts
+\caption[Ray Based Traversal]{Showing an example of ray based frustum traversal.}
+\label{fig:vf-ray-traversal}
+\end{center}
+\end{figure}
+
 Another method for grid traversal uses the chessboard metric.\cite{chess}
-Each slice of the frustum is determined by traversing cells that are a certain grid distance away from the origin.
+Each slice of the frustum is determined by traversing cells that are a certain grid distance away from the origin as shown in figure \ref{fig:chess-metric}.
 The distance is increased by 1 each slice.
 The view vector itself is rasterized as a line in 3D using the DDA algorithm.
 The cells that make up the points of the rasterized line are used as origin points from where traversal should fan out for that slice.
@@ -582,7 +636,7 @@ Modifying the algorithm to avoid this, especially extended to 3D, was too messy.
 The final idea involves taking axis aligned slices of the grid perpendicular to the highest magnitude component of the view vector.
 It's a simple algorithm compared to the previously tried solutions and can be based on existing convex polygon rasterization algorithms but extended to 3D.
 This isn't a true front to back traversal but it provides the needed results.
-In the figure below, cell 8 is traversed after cell 7, but cell 8 is closer in distance.
+In figure \ref{fig:frustum-iter}, cell 8 is traversed after cell 7, but cell 8 is closer in distance.
 However, cell 7 will never occupy space in front of cell 8, so any objects in cell 7 will never be drawn in front of cell 8.
 Cell 8 will be occluded by objects in cell 3 and 0, while cell 7 will most likely by occluded by objects in cells 6, 5, 2, 1, and 0.
 As long as a cell is traversed after the cells that could potentially occlude it, the query results will be optimal and not create false positives.
@@ -604,7 +658,7 @@ This depth sorting can even be parallelized by using a separate thread per cell,
 \label{handling-wide-fields-of-view}
 In practice, view frustums are very wide.
 A camera using a 90 degree vertical field of view on a 16:9 wide screen monitor will do this.
-Wide frustums cause cells that should have been occluded to be traversed before the cells that occlude them.
+Wide frustums cause cells that should have been occluded to be traversed before the cells that occlude them as shown in figure \ref{fig:wide-frustum-iter}.
 In this case cell 0 is most likely occluded by cells 3, 4, and 5.
 Even if the camera is staring straight at a wall, cells 0, 1, and 2 will falsely pass the occlusion queries because the wall in cell 3 hasn't been rendered to the z buffer yet.
 
@@ -618,7 +672,7 @@ Even if the camera is staring straight at a wall, cells 0, 1, and 2 will falsely
 \end{figure}
 
 Splitting the frustum into pieces solves this.
-The splitting point is centered around the cell where the eye is located.
+The splitting point is centered around the cell where the eye is located as shown in figure \ref{fig:correct-wide-frustum-iter}.
 This creates new convex volumes out of the split view frustum.
 In 3D, the frustum is split into 8 pieces by the x, y, and z planes.
 A convex polygon plane clipping algorithm will do the trick.
@@ -648,7 +702,8 @@ In this case cells have to be individually checked to see if they are in the vie
 \subsection{Render State Sorting}
 \label {render-state-sorting}
 Other rendering algorithms that make use of hardware occlusion queries usually benefit from having all objects sorted front to back.
-This way a tree in front of a dog can potentially occlude the dog.
+(TODO: I'm going to reword this section with the dogs and the garbage cans)
+This way a tree in front of a dog can potentially occlude the dog in figure \ref{fig:a-scene}.
 Then a tree farther in the distance may be occluded by a garbage can.
 This would require the objects to be drawn in the order, Tree A, Dog, Garbage Can, Tree B.
 
@@ -817,11 +872,15 @@ The same grid that stores objects in the scene can be queried for which lights a
 \label{spreading-queries}
 
 Tight detailed indoor environments benefit from the scene using a finer grid.
-The hallway in fig 1337 is built around the hangar bay in pictured in fig 6969.
+The hallway in \ref{fig:hangar-halls} is built around the hangar pictured in \ref{fig:hangar-bay}.
 If the grid is too sparse, large chunks of the hangar get rendered that should be occluded by the walls of the hallway because the cells are too big and contain too many objects.
 
 \begin{figure}
 \begin{center}
+\includegraphics[width=\textwidth]{Images/Hangar.jpg}
+\captionfonts
+\caption[Hangar Bay]{Hangar halls}
+\label{fig:hangar-bay}
 \includegraphics[width=\textwidth]{Images/HallCorner.jpg}
 \captionfonts
 \caption[Hangar Halls]{Hangar halls}
@@ -831,7 +890,8 @@ If the grid is too sparse, large chunks of the hangar get rendered that should b
 
 When inside the hallway of \ref{fig:hangar-halls}, the frame rate is about 60 FPS with a fine grid, and can drop down to 25 FPS with a more sparse grid.
 However, having too fine a grid can also be bad for performance overall.
-The frustum rasterization algorithm has no problem with traversing extreme amounts of cells, but the querying and rendering of individual cells is the bottleneck.
+The frustum rasterization algorithm has no problem with traversing grids as large as 1000 x 1000 x 1000 cells.
+The querying and rendering of individual cells is the bottleneck.
 Depending on the camera position and viewing angle, the number of traversed cells in a fine grid can range from about 500 to 60,000.
 There isn't a good way to batch all of the cubes that get rendered for the cell queries into a single draw call.
 The queries happen in between rendering a group of objects to the depth buffer and there seems to be no way to have a query for each individual object in a batch at the moment.
