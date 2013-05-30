@@ -565,17 +565,68 @@ They make no mention on whether or not objects noticeably pop in late with this 
 \chapter{Visbility Culling Algorithm}
 \label{visibility-culling-algorithm}
 
-\section{Scene Management}
-\label{scene-management}
+In this chapter, we describe the steps in the visibility culling algorithm. (TODO: write this paragraph when I'm done revising the chapter)
+
+\section{Algorithm Overview}
+\label{algorithm-overview}
 
 This algorithm stores the scene in a uniform grid.
-A grid is very easy to keep updated with the contents of a fully dynamic scene.
+A grid is easy to keep updated with the contents of a fully dynamic scene.
 Objects that move around can use their Axis Aligned Bounding Box to determine which cells they need to be tracked in.
-A grid's structure doesn't need to be recomputed as the scene changes in real time like the other static structures would.
+A grid's structure does not need to be recomputed as the scene changes in real time like the other static structures would.
 There is no branching as the structure is traversed, making it easier to process the scene in one pass with occlusion queries.
 The results of visibility changes in a heirarchical structure would take a few extra frames to propagate, possibly increasing the likelyhood of noticeable popping artifacts.
 
-\subsection{Objects at Cell Boundaries}
+Figure \ref{fig:algorithm-00} shows a top view of a full scene and the field of view of a camera that is looking at the scene.
+The grid cells that intersect the camera's view frustum are traversed in front to back order relative to the camera.
+For each cell that gets traversed, an occlusion query is issued.
+Color and depth write are disabled and just the box of the cell is rendered.
+
+\begin{figure}
+\begin{center}
+\includegraphics[width=0.75\textwidth]{Images/sceneAlgorithm/00.png}
+\captionfonts
+\caption[A Scene]{The overall scene partitioned by a uniform grid.  The green cone represents the camera's field of view.}
+\label{fig:algorithm-00}
+\end{center}
+\end{figure}
+
+If the cell is marked visible in a previous frame, the cell's objects are now rendered with depth write only but color write turned off.
+This way objects are put into the z buffer to occlude cells farther back but none of the expensive lighting and shading calculations are performed.
+The cell's objects are also queued up to later be rendered in full color.
+Figure \ref{fig:algorithm-01} shows a moment in time during the frustum traversal and Figure \ref{fig:algorithm-02} shows a fully traversed scene.
+
+\begin{figure}
+\begin{center}
+\includegraphics[width=0.75\textwidth]{Images/sceneAlgorithm/01.png}
+\captionfonts
+\caption[Traversing The Camera View]{A moment in time.  The objects are white to show that they are only rendered to the depth buffer at this stage.  The cells of the grid within the camera's view are being traversed.  Green represents cells visible to the camera.  Red represents occluded cells.}
+\label{fig:algorithm-01}
+\end{center}
+\end{figure}
+
+Now that the scene is fully traversed and all objects that are from visible cells are queued up, they get rendered with color write on.
+Figure \ref{fig:algorithm-03} shows a full color scene with objects being rendered only if their cells were determined to be visible.
+
+\begin{figure}
+\begin{center}
+\includegraphics[width=0.75\textwidth]{Images/sceneAlgorithm/02.png}
+\captionfonts
+\caption[Traversed Camera View]{The scene fully traversed.}
+\label{fig:algorithm-02}
+\end{center}
+\end{figure}
+
+\begin{figure}
+\begin{center}
+\includegraphics[width=0.75\textwidth]{Images/sceneAlgorithm/03.png}
+\captionfonts
+\caption[Rendered Scene]{The scene is now rendered in full color.}
+\label{fig:algorithm-03}
+\end{center}
+\end{figure}
+
+\subsection{Objects at Cell Boundaries (No revisions beyond this point yet)}
 \label{objects-at-cell-boundaries}
 When doing spatial queries against a grid, some group of cells gets traversed and all objects in those cells get returned in the query.
 If an object occupies multiple cells it can potentially get added multiple times as a query result.
