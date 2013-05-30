@@ -171,8 +171,8 @@ Maintining a smooth, also known as interactive, framerate is important for ensur
 Real time graphics are a challenge because a scene may need to be rendered with the quality that looks as close to non-real time graphics as possible like the scene from Battlefield 3 in figure \ref{fig:bf3}.
 Many calculations need to be performed to produce the resulting geometry and lighting for a frame.
 Photorealistic real time graphics get away with many shortcuts to look as real as possible.
-The result may not be completely realistic and doesn't simulate the physics of light as accurately as non-real time graphics, but the resulting image still looks good.
-It's possible to have non-photo realistic graphics as well like the character from Borderlands 2 in figure \ref{fig:borderlands2}, but those too require a large amount of processing power.
+The result may not be completely realistic and does not simulate the physics of light as accurately as non-real time graphics, but the resulting image still looks good.
+It is possible to have non-photo realistic graphics as well like the character from Borderlands 2 in figure \ref{fig:borderlands2}, but those too require a large amount of processing power.
 
 \begin{figure}
 \begin{center}
@@ -208,9 +208,9 @@ These kinds of environments are achievable by avoiding drawing as much of the wo
 This is the job of a visibility culling algorithm.
 The scene is viewed through a virtual camera.
 Objects visible to the camera fit within the frustum as shown in figure \ref{fig:frustum}.
-It's relatively easy to avoid drawing portions of the scene that aren't in the camera's field of view with view frustum culling by checking if the object is inside this frustum.
+It is relatively easy to avoid drawing portions of the scene that are not in the camera's field of view with view frustum culling by checking if the object is inside this frustum.
 (TODO: cite: http://www.lighthouse3d.com/tutorials/view-frustum-culling/)
-If a camera is looking at a wall or a mountain in the distance, it's also best to avoid drawing things behind those objects.
+If a camera is looking at a wall or a mountain in the distance, it is also best to avoid drawing the objects behind them.
 Figuring out that objects are behind other objects in real time is a challenge but can save many unnecessary draw calls to the GPU.
 
 \begin{figure}
@@ -223,12 +223,12 @@ Figuring out that objects are behind other objects in real time is a challenge b
 \end{figure}
 
 A visibility culling algorithm should do its best to determine which objects are not visible to the camera.
-The algorithm may generate some false positives and determine that a few objects are visible when they really aren't.
+The algorithm may generate some false positives and determine that a few objects are visible when they really are not.
 Since the GPU is able to render geometry very quickly, a few extra objects will just cause a negligible performance drop.\cite{large-occluders}
 The visual quality starts to suffer if objects go missing that should actually be there, so false negatives on visibility should be avoided.
 Most of the visibility culling work happens on the CPU while the GPU does all the rendering.
-If the CPU is doing too much work finding which objects the GPU shouldn't render, the performance may be worse than if there is no occlusion culling algorithm in the first place.
-A good algorithm must strike the perfect balance where the CPU isn't working too hard but is still saving the GPU a lot of work, giving a considerable performance increase.
+If the CPU is doing too much work finding which objects the GPU should not render, the performance may be worse than if there is no occlusion culling algorithm in the first place.
+A good algorithm must strike the perfect balance where the CPU is not working too hard but is still saving the GPU a lot of work, giving a considerable performance increase.
 
 \section{Dynamic Environments}
 \label{dynamic-environments}
@@ -262,7 +262,7 @@ This lets artists see exactly how the environment looks as if they were currentl
 \section{Artist Placed Hint Objects}
 \label{artist-placed-hint-objects}
 
-Sometimes an algorithm can't figure out the best way to perform visibility culling in every situation so artists need to place hint objects.
+Sometimes an algorithm can not figure out the best way to perform visibility culling in every situation so artists need to place hint objects.
 Hint objects allow an engine to avoid making calculations since the information is given by the designer.
 This creates a lot of extra work for the artists and can be really tedious.
 Artists now need to be educated on the technical inner workings of the engine so they can place the hint objects in the best way.
@@ -272,7 +272,7 @@ Portals are objects that are placed in windows and doorways linking different ro
 They help the engine render objects only visible to the camera through the portal geometry and not through the walls.
 They are effective in static environments where the artists know a door or window will always be around.
 However if someone takes a rocket launcher and blows up a hole in a wall, there is no artist placed portal there to help the engine.
-The engine won't necessarily be smart enough to know how to best place a portal there since any kind of arbitrary destruction can take place.
+The engine will not necessarily be smart enough to know how to best place a portal there since any kind of arbitrary destruction can take place.
 The zones divided by portals are often static as well and the engine would need to somehow figure out how to create new zones on the fly.
 Portals can also be very tedious for the level designers to keep track of as they are constantly iterating on the design of a level.
 
@@ -296,7 +296,7 @@ If an object is destructible, the low resolution mesh must somehow be deformable
 \label{our-contribution}
 This paper presents a simple high performing visibility culling algorithm that any 3D engine can integrate.
 It allows rendering of large outdoor worlds that are seamlessly combined with detailed indoor architecture.
-It requires hardware that supports occlusion queries which allow the GPU to report how many pixels of an object aren't occluded by other objects.\cite{GpuGem-Queries}
+It requires hardware that supports occlusion queries which allow the GPU to report how many pixels of an object are not occluded by other objects.\cite{GpuGem-Queries}
 
 This algorithm avoids the added complexity of a software rasterizer.
 Similar algorithms use software occlusion queries in order to avoid the delay when retrieving hardware occlusion query results.\cite{culling-bf}
@@ -313,28 +313,47 @@ This reduces false positives in visibility tests.
 \chapter{Background}
 \label{background}
 
+This section provides an overview of computer graphics concepts relevant to this paper.
+First, we describe how software interfaces with the GPU in Section \ref{3d-graphics-api}.
+Sections \ref{z-buffer-and-depth-test} and \ref{other-tests} describe tests that are part of the graphics pipeline for preventing pixels from being written to the screen.
+Next, the application of the pipeline's tests for use in Hardware Occlusion Queries is explained in section \ref{hardware-occlusion-queries}.
+Section \ref{spatial-data-structures} is an overview of spatial data structures that are essential in most graphics algorithms.
+
+\section{3D Graphics API}
+\label{3d-graphics-api}
+
+There are many Application Programming Interfaces (APIs) for allowing software to interface with the graphics pipeline.
+The pipeline may be running in software on the CPU or hardware accelerated by the GPU.
+The APIs allow software to change states in the graphics pipeline and to issue draw calls.
+Two widely used APIs on personal computers are OpenGL and Direct 3D.\cite{about-openGL, about-direct3D}
+The APIs may be different but the computer graphics concepts remain the same.
+The project in this paper was built with OpenGL but is portable to Direct3D.
+
+\subsection{OpenGL}
+\label{openGl}
+
+OpenGL is a cross platform standard for rendering 3D graphics maintained by the Khronos group.\cite{about-openGL}
+OpenGL APIs are available on many systems such as Windows, Linux, and MacOS.
+OpenGL ES is the mobile version bringing 3D graphics to iPhone and Android devices.\cite{ios-glEs, android-glEs}
+
+\subsection{Direct3D}
+\label{direct3d}
+
+Direct3D is part of Microsoft's DirectX package.\cite{about-direct3D}
+It is available on platforms such as Windows, Xbox, and Windows 8 phones.
+At the time of this writing, DirectX 11 is the latest version and has some features that make it easier for multithreaded applications to issue draw calls in parallel.\cite{d3d11-parallel}
+
 \section{Z Buffer and Depth Test}
 \label{z-buffer-and-depth-test}
 
-The z buffer is allocated along with the buffer to where the image is rendered.
-A depth value gets computed for each fragment, which corresponds to a pixel, of a triangle as it gets rasterized by the graphics hardware.
+The z buffer is allocated along with the Frame Buffer where the image is rendered.
+A depth value gets computed for each fragment, which corresponds to a pixel of a triangle as it gets rasterized by the graphics hardware.
 The early z test happens right before the work of the fragment shader where the color of the pixel gets computed and written.\cite{d3d11-pipeline}
 The graphics hardware compares the depth value of the fragment about to be written with the value already written.
 By default, OpenGL is set to allow a fragment to pass if the new value is less than the current value.\cite{gl-depth-func}
 This test is used for solid geometry only, which usually makes up most of the geometry in the scene.
-This means solid polygons don't need to be presorted by depth to have the scene look correct.
-The depth test is also essential for Hardware Occlusion queries which will be described later.
-
-\section{Other Tests}
-\label{other-tests}
-
-There are a few other tests done by the graphics pipeline that can potentially eliminate a fragment.\cite{GpuGem-Occlusion}
-The scissor test allows the setting a rectangle on the screen that is rendered to.
-Anything outside the scissor rectangle is not rasterized.
-The alpha test prevents a fragment from being rendered if the alpha portion of the color is below a certain threshold.
-The stencil test uses a buffer similar to the z buffer.\cite{d3d11-pipeline}
-Values can be rasterized to the stencil buffer and tested in some way.
-If the test passes early on, the fragment can be rasterized if it passes other tests.
+This means solid polygons do not need to be presorted by depth to have the scene look correct.
+The depth test is also essential for hardware occlusion queries which will be described later.
 
 \begin{figure}
 \begin{center}
@@ -345,90 +364,86 @@ If the test passes early on, the fragment can be rasterized if it passes other t
 \end{center}
 \end{figure}
 
+\section{Other Tests}
+\label{other-tests}
+
+There are a few other tests done by the graphics pipeline that can eliminate a fragment.\cite{GpuGem-Occlusion}
+The scissor test allows rectangle on the render target to be set.
+Anything outside the scissor rectangle is not rasterized.
+The stencil test uses a buffer similar to the z buffer.\cite{d3d11-pipeline}
+Values can be rasterized to the stencil buffer and tested in some way.
+The alpha test prevents a fragment from being rendered if the alpha, also known as opacity, portion of the color is below a certain threshold.
+These tests, along with the previously mentioned depth test, can be enabled or disabled depending on what is needed for a draw call.
+
 \section{Hardware Occlusion Queries}
 \label{hardware-occlusion-queries}
 
 The hardware occlusion query is a relatively new feature that is essential to this paper.
 The query measures how many fragments have passed for a set of draw calls.
-The fragments must pass all tests of the graphics pipeline described earlier to contribute to the query results.
+The fragments must pass all tests of the graphics pipeline described in Sections \ref{z-buffer-and-depth-test} and \ref{other-tests} to contribute to the query results.
 
-\begin{lstlisting}
-//creating a query in OpenGL
-GLuint query;
-glGenQueries(1, &query);
-
-//start the query before a set of draw calls
-glBeginQuery(GL_ANY_SAMPLES_PASSED, query);
-
-//some draw calls
-glDrawRangeElements(GL_TRIANGLES, ...);
-
-glBegin(GL_QUADS);
-    /*some deprecated immediate mode code 
-    which you should avoid doing.
-    This too works during occlusion queries.
-    */
-glEnd();
-
-glDrawRangeElements(GL_TRIANGLES, ...);
-glDrawRangeElements(GL_TRIANGLES, ...);
-
-//end the query after all those draw calls
-glEndQuery();
-
-//getting the result of a query
-GLint result;
-glGetQueryObjectiv(query, GL_QUERY_RESULT, &result);
-
-//check if query passed
-if(result) {
-    //do the real rendering
-}
-\end{lstlisting}
-
-A possible use of a hardware query is to render a simple easy to draw bounding box with color and depth writing disabled.
+A possible use of a hardware occlusion query is to first render an object's bounding box.
+The box is composed of only 12 triangles so it has very little impact on performance.
+The box should be rendered during a query with color and depth writing disabled.
 This means the box will never affect the final image, but it will still go through the full pipeline.
-If this box passes all of the pipeline's tests, the real object can be drawn.
-However, this is a naive approach that will negatively affect performance.
+The depth test should be enabled so fragments of the box can be rejected if other objects already rendered are occluding the box.
+Objects in the scene should be rendered front to back so occludees in back are tested against the occluders in front.
 
+After testing with the invisible bounding box, retreive the results of the query.
+If any fragments of the box passed, the real object is probably visible.
+Now color writing and depth writing should be enabled as the real object is rendered.
+With depth writing enabled, the object is written to the z buffer and can now serve as an occluder for more objects that are behind it.
+
+\subsection{CPU Stalls}
+\label{cpu-stalls}
+
+The approach just described negatively affects performance.
 The problem with hardware occlusion queries is their results may not be ready to read back when expected.\cite{GpuGem-Occlusion, GpuGem-Queries, CHC, CHCpp}
-The glGetQueryObject call may cause a CPU stall with the results often being available about 3 to 4 frames later.
-The problem arises due to the GPU having its own memory and processor where the data must travel across the bus.
-Draw calls are non-blocking and stored in a buffer for the GPU to execute whenever it gets around to it.
+The GPU has its own memory and processor.
+Data must travel across a bus on the motherboard between the CPU and GPU.
+Draw calls issued by the CPU are non-blocking and are stored in a buffer for the GPU to execute whenever it gets around to it.
 However, retreiving a value back from the GPU can cause a stall since the applicaiton must wait a few milliseconds for the data to travel across the bus.
+The query result may be available about 3 to 4 frames later.
 When there are thousands of objects to draw, the stalls add up.
-The challenge with using hardware occlusion queries is finding a way to effectively use them in later frames to reduce CPU stalls but also save the GPU from drawing too many unnecessary objects.
+The challenge with using hardware occlusion queries is finding a way to effectively use them in later frames to reduce CPU stalls but still save the GPU from drawing too many unnecessary objects.
 
-Conditional rendering is another recent feature on some of the newer hardware.
-This allows the results of a query to be used in the same frame.
-The GPU knows the results of a query after a draw call since the data is local and doesn't need to travel across the bus.
+\subsection{Conditonal Rendering}
+\label{conditional-rendering}
+
+Conditional rendering allows the results of a query to be used in the same frame.
+The GPU knows the results of a query after a draw call since the data is local and does not need to travel across the bus.
 The CPU still issues all potentially unnecessary draw calls but the GPU ignores them if the draw call depends on the results of a query.
-If hardware support for conditional rendering is not available, it's forced to run in software and and causes a drop in performance.
-This also doesn't prevent unnecessary traversals of portions of the scene by the CPU that may be invisible.
-It's simply a way to tell the GPU to ignore an already issed draw call.
+If hardware support for conditional rendering is not available, it is forced to run in software and and causes a drop in performance.
+This does not prevent unnecessary traversals of portions of the scene by the CPU that may be invisible.
+It is simply a way to tell the GPU to ignore an already issed draw call.
 
 \section{Spatial Data Structures}
 \label{spatial-data-structures}
 
-Spatial data structures greatly help reduce the search space by filtering out objects that can't possibly be returned.
-A data structure must never falseley filter out values that should be returned but it's always safe to return false positives.
+Spatial data structures accelerate spatial queries by reducing the search space.
+View Frustum Culling described earlier is an example of a spatial query that finds objects in the scene that are within the bounds of the frustum.
+Another example is to find all objects within a radius or axis aligned bounding box.
+Many spatial data structures exist, each with their own pros and cons.
+The right structure should be chosen depending on the application.
+Chapter \ref{related-work} provides an overview of other visibility culling techniques and what spatial data structures were chosen.
 
-The grid is one of the simplest structures.
+The uniform grid is one of the simplest structures.
+It provides a uniform subdivision of space.
 Objects have a bounding box, and are binned into cells of the grid that overlap with the bounding box.\cite{culling-bf, applications-spatial, chess}
 Querying for objects in the grid simply requires indexing into cells of the grid which intersect with the spatial query.
 This is an optimal structure for cases when objects are evenly distributed in the world.
 This could be an issue if the scene has hundreds of objects in one cell while the rest of the cells have very sparse amounts of objects.
-Querying within the bounds of that cell wouldn't reduce the search space by very much.
+Querying within the bounds of that cell would not reduce the search space by very much.
 
 A spatial hash is similar to a grid but allows the scene to not be constrained within predefined bounds.
 The hash has buckets just like a grid has cells, but multiple cells can hash to one bucket.
 For example, if the grid is allocated to hold 5 by 5 cells, grid cell (1, 3) would hash to the same bucket as (6, 3).
-A standard grid wouldn't be able to handle cell (6, 3) since that's outside of the grid.
+A standard grid would not be able to handle cell (6, 3) since that is outside of the grid.
 
 Quad trees are a heirarchical datastructure that handles unevenly distributed objects better.\cite{applications-spatial}
 It distributes the objects by progressively dividing each cell into four smaller cells until each cell has a small enough number of objects for the application.
 Since it is structured as a tree, many cells get filtered out along the traversal before reaching the leaf cells.
-Once a path down a traversal isn't taken, all child nodes in the heirarchy are automatically ignored.
+Once a path down a traversal is not taken, all child nodes in the heirarchy are automatically ignored.
 This helps filter out many more potential objects than a grid earlier on in the search.
 Octrees are a 3D extension of quadtrees and divide each cell into 8 children rather than 4.
 This can be extended to other dimensions beyond that as well, to help with problems mapped to multiple dimensions.\cite{applications-spatial}
@@ -437,13 +452,14 @@ Bounding volume heirarchies are another common heirarchical structure.\cite{BVH}
 This organizes the scene by having each node be a bounding box that contains the bounding boxes of all of its children.
 The leaves in the tree contain the objects themselves.
 As the tree is traversed, the bounding box of the query is used to determine what set of children to follow if their bounding box also intersects the query object.
+A well balanced tree structure gives the best overall performance.
 This kind of structure allows any arbitrary scene layout while grids and quadtrees are constrained to hold the scene within predefined bounds.
 
 K-D trees recursively divide up a space into two halves with axis aligned planes.\cite{Vis-Computations-Densely-Occluded, Doom3-source-review}
 They can look a bit similarly to Octrees in some situations.
-The space is divided in a way that evenly distributes the geometry between the two planes, handling the poorer distribution of Octrees and grids.
+The space is divided in a way that evenly distributes the geometry between the two planes, handling the poorer distribution of Octrees and Uniform Grids.
 Binary Space Partitioning trees are similar except they divide space with arbitrary planes.
-The final result is an even better distribution of geometry but the algorithm for computing the tree is more time consuming.
+The final result is an even better distribution of geometry that results in a more balanced tree, but the algorithm for computing the tree is more time consuming.
 
 \chapter{Related Work}
 \label{related-work}
