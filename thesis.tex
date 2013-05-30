@@ -466,16 +466,15 @@ The final result is an even better distribution of geometry that results in a mo
 
 Visibility Culling has been performed with a variety of methods over the last decades.
 Many clever tricks have been found that take advantage of certain assumptions about a scene, sometimes limiting what kinds of scenes are possible.
-Keeping a scene static while performing a walkthrough of an indoor area is common.
-Some software-based occlusion culling solutions have been used as well in order to avoid the CPU stalls of hardware occlusion queries.
+Keeping a scene static while performing a walkthrough of an indoor area is common.\cite{Vis-Computations-Densely-Occluded, Portals-mirrors, Doom3-source-review}
+Some software-based occlusion culling solutions have been used as well in order to avoid the CPU stalls of hardware occlusion queries.\cite{spliter, culling-bf}
 
 One visibility culling algorithm uses mathematical properties of convex polyhedral objects to determine visibility on the fly.\cite{large-occluders}
-Coorg and Teller find objects in the scene that serve as large occluders, and avoid testing against smaller objects that wouldn't serve as effective occluders.
-Since the environments are made of collections of convex geometry, it's possible to compute separating and supporting planes from pairs of objects and compute whether or not one object is occluding another.
+Coorg and Teller find objects in the scene that serve as large occluders, and avoid testing against smaller objects that would not serve as effective occluders.
+Since the environments are made of collections of convex geometry, it is possible to compute separating and supporting planes from pairs of objects and compute whether or not one object is occluding another.
 The algorithm was developed at a time when the z buffer may be unavailable or done slowly in software, so this algorithm was able to avoid relying on the z buffer.
 
-Portal culling, which was mentioned earlier, is a very effective technique that many engines can easily implement.
-Portals are typically useful in indoor environments and aren't effective in outdoor environments.\cite{Portals-mirrors}
+Portal culling, which was mentioned earlier, is effective for indoor environments but not as effective in outdoor environments.\cite{Portals-mirrors}
 If the environment is subdivided into zones, only geometry in zones that are determined to be visible gets rendered.
 The camera's initial view frustum gets computed.
 The geometry in the zone the camera is located is then rendered.
@@ -507,7 +506,7 @@ This way the game can ship with the levels in their editable form for people to 
 
 Zang, Manocha, Hudson, and Hoff have developed an algorithm that uses a heirarchy of occlusion maps.\cite{heir-occ-map}
 Occlusion maps are similar to the z buffer.
-In this algorithm a heirarchy of buffers is created, which are basically the z buffer at different levels of detail.
+In this algorithm a heirarchy of buffers is created, which are similar to the z buffer at different levels of detail.
 Occluders are rendered to this buffer.
 Occludees then are tested against the right buffer depending on how big they are on the screen by testing and rasterizing a bounding rectangle.
 An algorithm similar to this was applied in Ubisoft's Splinter Cell Conviction.\cite{spliter}
@@ -551,7 +550,7 @@ Cryengine also allows for use of portals and occlusion geometry that they refer 
 
 The dPVS algorithm developed by Aila and Miettenen is another similar algorithm capable of rendering large dynamic environments.\cite{dpvs}
 Their system allows for a combination of various occlusion culling algorithms such as portals and queries.
-The scene is organized by a K/D tree.
+The scene is organized by a K-D tree.
 This data structure is normally used best in static environments, but this algorithm is able to effectively recompute the structure on the fly.
 They too use a coverage buffer for occlusion queries where the sillhouettes of objects are rasterized.
 Queries are then run against this coverage buffer.
