@@ -164,7 +164,7 @@ Computer graphics can be non-real time, for example when doing CGI for a movie.
 Each frame can take hours to render, and the result is a very photorealistic image that looks like it is part of the movie itself.
 Millions of frames are generated only for each still frame to be visible for a fraction of a second until the next frame to give the illusion of motion.
 Real time graphics also display a frame for only a fraction of a second but are rendered on the fly right as the user is controlling the application.
-This means the computer only has 33.33 milliseconds if trying to render at 30 frames per second.
+This means the computer only has 33.33 milliseconds if trying to render at 30 frames per second (FPS).
 Most computer monitors update at 60 Hz so real time graphics typically strive for 60 FPS giving an even smoother experience, and this means the computer now only has 16.66 milliseconds to render a frame.
 Maintining a smooth, also known as interactive, framerate is important for ensuring the user has a good experience controlling the application.\cite{Interactive}
 
@@ -308,7 +308,7 @@ The high detail objects that are rendered are also automatically occluding parts
 
 A front to back view frustum scene traversal algorithm is presented in order to make the query results optimal.
 If the objects in front are drawn before the objects behind, the objects behind can be tested against those already drawn objects.
-This reduces false positives in visibility tests.
+This reduces false positives in visibility tests because objects in back aren't mistakenly determined to be visible if the objects in front are processed first.
 
 \chapter{Background}
 \label{background}
@@ -440,7 +440,7 @@ The hash has buckets just like a grid has cells, but multiple cells can hash to 
 For example, if the grid is allocated to hold 5 by 5 cells, grid cell (1, 3) would hash to the same bucket as (6, 3).
 A standard grid would not be able to handle cell (6, 3) since that is outside of the grid.
 
-Quad trees are a heirarchical datastructure that handles unevenly distributed objects better.\cite{applications-spatial}
+The quad tree is a heirarchical datastructure that handles unevenly distributed objects better.\cite{applications-spatial}
 It distributes the objects by progressively dividing each cell into four smaller cells until each cell has a small enough number of objects for the application.
 Since it is structured as a tree, many cells get filtered out along the traversal before reaching the leaf cells.
 Once a path down a traversal is not taken, all child nodes in the heirarchy are automatically ignored.
@@ -626,21 +626,6 @@ Figure \ref{fig:algorithm-03} shows a full color scene with objects being render
 \end{center}
 \end{figure}
 
-\subsection{Objects at Cell Boundaries (No revisions beyond this point yet)}
-\label{objects-at-cell-boundaries}
-When doing spatial queries against a grid, some group of cells gets traversed and all objects in those cells get returned in the query.
-If an object occupies multiple cells it can potentially get added multiple times as a query result.
-Keeping track of a 64 bit unsigned query id counter can prevent this.
-The main scene can store a query counter, and increment it every time a query occurs.
-The objects returned by the query can keep a query counter within them as well.
-If the object's counter is less than the scene's counter, then the object hasn't been added to the query results yet.
-As the object is added, its counter is set to the scene's counter and any other cells that contain the object won't needlessly duplicate the object in the query.
-
-In a multithreaded engine, when many queries can occur in parallel, a lockless set of query ids per object can work.
-If a query id is already in the object's query set, the object can be ignored.
-After the query results are done, the query id can be removed from the set, keeping the set from growing.
-Lockless sets that are part of Intel Thread Building Blocks don't allow safe lockless removal, so it may be best to clear these sets at some synchronization point such as the end of a frame to prevent them from growing too large.\cite{tbb}
-
 \section{Grid View Frustum Culling}
 \label{grid-view-frustum-culling}
 
@@ -651,6 +636,8 @@ This allows all objects grouped in a cell to be culled out at once rather than m
 If a cell is right at the border of the view frustum and a few objects inside the cell aren't in the frustum, it's not a problem to have the GPU needlessly render them.
 The work done by the CPU checking all objects in a cell will cause a higher performance drop than having the GPU draw a few wasted objects.
 This algorithm allows for large scenes with fine enough grids that there will usually be very few wasted objects compared to the immense number of objects that do get rendered.
+The space should be subdivided by the grid in a way that renders as few wastes objects as possible.
+For example, if the camera is located inside a room, there should be as little overlap in cells between the current room and the room on the other side of the wall in order to avoid rendering as many objects on the other side of the wall as possible.
 
 The cells in the grid should be traversed front to back relative to the view.
 Figure \ref{fig:vf-and-occluders} shows a top down view of a scene.
@@ -761,6 +748,21 @@ The 3D convex polygon rasterizing algorithm is optimized enough that it is able 
 Its implementation is outlined in the appendix.
 It's possible to avoid implementing this algorithm and use a simpler axis aligned box rasterizer.
 In this case cells have to be individually checked to see if they are in the view frustum.
+
+\subsection{Objects at Cell Boundaries}
+\label{objects-at-cell-boundaries}
+When doing spatial queries against a grid, some group of cells gets traversed and all objects in those cells get returned in the query.
+If an object occupies multiple cells it can potentially get added multiple times as a query result.
+Keeping track of a 64 bit unsigned query id counter can prevent this.
+The main scene can store a query counter, and increment it every time a query occurs.
+The objects returned by the query can keep a query counter within them as well.
+If the object's counter is less than the scene's counter, then the object hasn't been added to the query results yet.
+As the object is added, its counter is set to the scene's counter and any other cells that contain the object won't needlessly duplicate the object in the query.
+
+In a multithreaded engine, when many queries can occur in parallel, a lockless set of query ids per object can work.
+If a query id is already in the object's query set, the object can be ignored.
+After the query results are done, the query id can be removed from the set, keeping the set from growing.
+Lockless sets that are part of Intel Thread Building Blocks don't allow safe lockless removal, so it may be best to clear these sets at some synchronization point such as the end of a frame to prevent them from growing too large.\cite{tbb}
 
 \section{Rendering}
 \label{rendering}
