@@ -636,8 +636,9 @@ This allows all objects grouped in a cell to be culled out at once rather than m
 If a cell is right at the border of the view frustum and a few objects inside the cell aren't in the frustum, it's not a problem to have the GPU needlessly render them.
 The work done by the CPU checking all objects in a cell will cause a higher performance drop than having the GPU draw a few wasted objects.
 This algorithm allows for large scenes with fine enough grids that there will usually be very few wasted objects compared to the immense number of objects that do get rendered.
-The space should be subdivided by the grid in a way that renders as few wastes objects as possible.
-For example, if the camera is located inside a room, there should be as little overlap in cells between the current room and the room on the other side of the wall in order to avoid rendering as many objects on the other side of the wall as possible.
+The space should be subdivided by the grid in a way that renders as few wasted objects as possible.
+This applies to the occlusion culling as well.
+For example, if the camera is located inside a room, the cells at the border of the room should contain as few objects on the other side of the wall as possible or else a large portion of invisible objects get rendered along with the visible objects in the current room.
 
 The cells in the grid should be traversed front to back relative to the view.
 Figure \ref{fig:vf-and-occluders} shows a top down view of a scene.
