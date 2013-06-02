@@ -656,9 +656,9 @@ Cells farther from the camera get tested against the objects in front that are p
 
 A true front to back traversal of a grid is very difficult to do well.
 One attempt involved traversing out with rays from the center and stopping the traversal when reaching an occluded cell or the far plane as shown in figure \ref{fig:vf-ray-traversal}.
-A 3D DDA line rasterizing algorithm would be used to traverse the cells along a ray.
+A 3D DDA line rasterizing algorithm would be used to traverse the cells along a ray.\cite{dda-line}
 This method was rejected early on.
-There was a lot of difficulty in figuring out the best way to align the rays so that duplicate cell traversals were minimized and absolutely no cells were ever missed.
+There was difficulty in figuring out the best way to align the rays so that duplicate cell traversals were minimized and absolutely no cells were ever missed.
 
 \begin{figure}
 \begin{center}
@@ -675,7 +675,7 @@ The distance is increased by 1 each slice.
 The view vector itself is rasterized as a line in 3D using the DDA algorithm.
 The cells that make up the points of the rasterized line are used as origin points from where traversal should fan out for that slice.
 This algorithm made it difficult to avoid traversing cells completely outside of the view frustum.
-When the view is at an angle, there is a huge space past the far plane that ends up being needlessly traversed.
+When the view is at a 45 degree angle, there is a huge space past the far plane that ends up being needlessly traversed.
 Modifying the algorithm to avoid this, especially extended to 3D, was too messy.
 
 \begin{figure}
@@ -697,7 +697,7 @@ As long as a cell is traversed after the cells that could potentially occlude it
 This gives a true occlusion order traversal but not a true depth order traversal.
 This same traversal order is also perfect for roughly depth sorting alpha blended objects that will need to be rendered later.
 A shorter sub sort per cell rather than sorting over the entire list of objects to render can give the correct rendering order for transparent objects.
-This depth sorting can even be parallelized by using a separate thread per cell, however this hasn't been tried yet in the current renderer.
+This depth sorting can even be parallelized by using a separate thread per cell, however we leave this for future work.
 
 \begin{figure}
 \begin{center}
@@ -710,8 +710,9 @@ This depth sorting can even be parallelized by using a separate thread per cell,
 
 \subsection{Handling Wide Fields of View}
 \label{handling-wide-fields-of-view}
+
 In practice, view frustums are very wide.
-A camera using a 90 degree vertical field of view on a 16:9 wide screen monitor will do this.
+A camera using a standard 90 degree vertical field of view on a 16:9 wide screen monitor will create a horizontal field of about 160 degrees.
 Wide frustums cause cells that should have been occluded to be traversed before the cells that occlude them as shown in figure \ref{fig:wide-frustum-iter}.
 In this case cell 0 is most likely occluded by cells 3, 4, and 5.
 Even if the camera is staring straight at a wall, cells 0, 1, and 2 will falsely pass the occlusion queries because the wall in cell 3 hasn't been rendered to the z buffer yet.
@@ -732,7 +733,7 @@ In 3D, the frustum is split into 8 pieces by the x, y, and z planes.
 A convex polygon plane clipping algorithm will do the trick.
 The volumes are now traversed in a fan out order around the center cell.
 In the figure below, first the central volume is traversed, and then cells 22, 23, and 24 are traversed afterwards.
-This keeps the correct occluder order and avoids false positives.
+This keeps the correct occluder order prevents cells from being falseley determined to be visible.
 
 \begin{figure}
 \begin{center}
@@ -742,13 +743,6 @@ This keeps the correct occluder order and avoids false positives.
 \label{fig:correct-wide-frustum-iter}
 \end{center}
 \end{figure}
-
-\subsection{The Rasterizing Algorithm}
-\label{the-rasterizing-algorithm}
-The 3D convex polygon rasterizing algorithm is optimized enough that it is able to quickly process very dense grids.
-Its implementation is outlined in the appendix.
-It's possible to avoid implementing this algorithm and use a simpler axis aligned box rasterizer.
-In this case cells have to be individually checked to see if they are in the view frustum.
 
 \subsection{Objects at Cell Boundaries}
 \label{objects-at-cell-boundaries}
@@ -764,6 +758,55 @@ In a multithreaded engine, when many queries can occur in parallel, a lockless s
 If a query id is already in the object's query set, the object can be ignored.
 After the query results are done, the query id can be removed from the set, keeping the set from growing.
 Lockless sets that are part of Intel Thread Building Blocks don't allow safe lockless removal, so it may be best to clear these sets at some synchronization point such as the end of a frame to prevent them from growing too large.\cite{tbb}
+
+\subsection{The Rasterizing Algorithm}
+\label{the-rasterizing-algorithm}
+The algorithm doesn't handle just frustums, but any convex polygon with any arbitrary amount of points and edges.
+This allows the algorithm to handle the frustum being clipped against the level bounds and sliced into 8 peices to handle wide and angled views.
+
+The algorithm is optimized enough that it is able to quickly process very dense grids.
+It has been tested on grids of 1,000 x 1,000 x 1,000 cells and the framerate stayed at about 40 FPS in the worst case, and at about 100 in other cases.
+It was tested by making OpenGL render a point at the center of what would be a cell in 3D space.
+Such a dense grid is not practical for the visibility culling algorithm itself.
+It would take over 59 gigabytes in RAM to store one billion 64 bit NULL pointers for a completely empty scene.
+Since the hardware must also render a box for each cell, the performance would drop siginificantly rendering that many boxes and later retreiving occlusion query results even if a system had that much memory.
+Thus, the CPU is able to rasterize dense grids with relative ease, while memory and GPU power are the bottlenecks requiring the grids to be even less dense in practice.
+
+It is possible to avoid implementing this algorithm and use a simpler axis aligned box rasterizer.
+The axis aligned bounding box of the view frutum can be traversed in occlusion order row by row by just using three nested loops, one for each dimension.
+In this case cells that are outside of the view frustum get traversed, creating some wasted effort by the CPU as well as requiring either wasted cell queries or to check if each cell is in the view frustum.
+
+The algorithm works by taking a convex polygon as shown in Figure \ref{fig:scene-frust} and processing it slice by slice down the grid as shown in Figure \ref{fig:scene-frust-slice}.
+Each slice is now a 2D polygon, so a modified 2D rasterizer is used similar to existing 2D convex polygon rasterizing algorithms.
+For each row in the slice, the range of cells to be traversed is computed as shown in Figure \ref{fig:scene-frust-row}.
+The full implementation is presented in the appendix.
+
+\begin{figure}
+\begin{center}
+\includegraphics[width=0.5\textwidth]{Images/RasterizingAlgorithm/Final/Frust.png}
+\captionfonts
+\caption[A Frustum]{A view frustum within the bounds of a scene.}
+\label{fig:scene-frust}
+\end{center}
+\end{figure}
+
+\begin{figure}
+\begin{center}
+\includegraphics[width=0.5\textwidth]{Images/RasterizingAlgorithm/Final/FrustSlice.png}
+\captionfonts
+\caption[A Frustum Slice]{A 2D slice of the same frustum seen from the side.}
+\label{fig:scene-frust-slice}
+\end{center}
+\end{figure}
+
+\begin{figure}
+\begin{center}
+\includegraphics[width=0.5\textwidth]{Images/RasterizingAlgorithm/Final/FrustSliceNRowOrthoLabeled.png}
+\captionfonts
+\caption[A Frustum Slice And Row]{A row from the slice being rasterized.}
+\label{fig:scene-frust-row}
+\end{center}
+\end{figure}
 
 \section{Rendering}
 \label{rendering}
