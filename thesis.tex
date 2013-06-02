@@ -61,6 +61,8 @@
                 numbersep=5pt
 }
 
+\usepackage{algorithm2e}
+
 \bibliographystyle{abbrv}
 
 \setlength{\parindent}{0.25in} \setlength{\parskip}{6pt}
@@ -168,11 +170,11 @@ This means the computer only has 33.33 milliseconds if trying to render at 30 fr
 Most computer monitors update at 60 Hz so real time graphics typically strive for 60 FPS giving an even smoother experience, and this means the computer now only has 16.66 milliseconds to render a frame.
 Maintining a smooth, also known as interactive, framerate is important for ensuring the user has a good experience controlling the application.\cite{Interactive}
 
-Real time graphics are a challenge because a scene may need to be rendered with the quality that looks as close to non-real time graphics as possible like the scene from Battlefield 3 in figure \ref{fig:bf3}.
+Real time graphics are a challenge because a scene may need to be rendered with the quality that looks as close to non-real time graphics as possible like the scene from Battlefield 3 in Figure \ref{fig:bf3}.
 Many calculations need to be performed to produce the resulting geometry and lighting for a frame.
 Photorealistic real time graphics get away with many shortcuts to look as real as possible.
 The result may not be completely realistic and does not simulate the physics of light as accurately as non-real time graphics, but the resulting image still looks good.
-It is possible to have non-photo realistic graphics as well like the character from Borderlands 2 in figure \ref{fig:borderlands2}, but those too require a large amount of processing power.
+It is possible to have non-photo realistic graphics as well like the character from Borderlands 2 in Figure \ref{fig:borderlands2}, but those too require a large amount of processing power.
 
 \begin{figure}
 \begin{center}
@@ -207,7 +209,7 @@ Games like Rage by idSoftware, Battlefield 3 by Dice, Crysis by Crytek, and Just
 These kinds of environments are achievable by avoiding drawing as much of the world as possible.\cite{heir-occ-map, large-occluders, Vis-Computations-Densely-Occluded, Portal-culling, Cryengine-culling-explained, Portals-mirrors, dpvs, cryengine3, culling-bf, CHC, CHCpp}
 This is the job of a visibility culling algorithm.
 The scene is viewed through a virtual camera.
-Objects visible to the camera fit within the frustum as shown in figure \ref{fig:frustum}.
+Objects visible to the camera fit within the frustum as shown in Figure \ref{fig:frustum}.
 It is relatively easy to avoid drawing portions of the scene that are not in the camera's field of view with view frustum culling by checking if the object is inside this frustum.
 (TODO: cite: http://www.lighthouse3d.com/tutorials/view-frustum-culling/)
 If a camera is looking at a wall or a mountain in the distance, it is also best to avoid drawing the objects behind them.
@@ -262,7 +264,7 @@ This lets artists see exactly how the environment looks as if they were currentl
 \section{Artist Placed Hint Objects}
 \label{artist-placed-hint-objects}
 
-Sometimes an algorithm can not figure out the best way to perform visibility culling in every situation so artists need to place hint objects.
+Sometimes an algorithm can not Figure out the best way to perform visibility culling in every situation so artists need to place hint objects.
 Hint objects allow an engine to avoid making calculations since the information is given by the designer.
 This creates a lot of extra work for the artists and can be really tedious.
 Artists now need to be educated on the technical inner workings of the engine so they can place the hint objects in the best way.
@@ -277,7 +279,7 @@ The zones divided by portals are often static as well and the engine would need 
 Portals can also be very tedious for the level designers to keep track of as they are constantly iterating on the design of a level.
 
 Occluder geometry is also often used in modern game engines.
-Modelers can make a low detail version of a mesh as shown in figure \ref{fig:occluder-geometry}.\cite{culling-bf}
+Modelers can make a low detail version of a mesh as shown in Figure \ref{fig:occluder-geometry}.\cite{culling-bf}
 The engine can then do ray intersection tests against all triangles in this mesh to test if some object is behind the geometry.\cite{Cryengine-culling-explained}
 Engines that do software occlusion culling render these meshes CPU side rather than rendering the detailed geometry the GPU powered hardware occlusion queries would render.
 Making these low resolution meshes that are used specifically for occlusion culling creates extra work for modelers.
@@ -647,7 +649,7 @@ Cells farther from the camera get tested against the objects in front that are p
 
 \begin{figure}
 \begin{center}
-\includegraphics[width=\textwidth]{Images/frustum.pdf}
+\includegraphics[width=0.75\textwidth]{Images/frustum.pdf}
 \captionfonts
 \caption[View Frustum and Occluders]{A view frustum, and the objects inside occluding each other.}
 \label{fig:vf-and-occluders}
@@ -655,14 +657,14 @@ Cells farther from the camera get tested against the objects in front that are p
 \end{figure}
 
 A true front to back traversal of a grid is very difficult to do well.
-One attempt involved traversing out with rays from the center and stopping the traversal when reaching an occluded cell or the far plane as shown in figure \ref{fig:vf-ray-traversal}.
+One attempt involved traversing out with rays from the center and stopping the traversal when reaching an occluded cell or the far plane as shown in Figure \ref{fig:vf-ray-traversal}.
 A 3D DDA line rasterizing algorithm would be used to traverse the cells along a ray.\cite{dda-line}
 This method was rejected early on.
 There was difficulty in figuring out the best way to align the rays so that duplicate cell traversals were minimized and absolutely no cells were ever missed.
 
 \begin{figure}
 \begin{center}
-\includegraphics[width=\textwidth]{Images/ray-traversal.pdf}
+\includegraphics[width=0.75\textwidth]{Images/ray-traversal.pdf}
 \captionfonts
 \caption[Ray Based Traversal]{Showing an example of ray based frustum traversal.}
 \label{fig:vf-ray-traversal}
@@ -670,7 +672,7 @@ There was difficulty in figuring out the best way to align the rays so that dupl
 \end{figure}
 
 Another method for grid traversal uses the chessboard metric.\cite{chess}
-Each slice of the frustum is determined by traversing cells that are a certain grid distance away from the origin as shown in figure \ref{fig:chess-metric}.
+Each slice of the frustum is determined by traversing cells that are a certain grid distance away from the origin as shown in Figure \ref{fig:chess-metric}.
 The distance is increased by 1 each slice.
 The view vector itself is rasterized as a line in 3D using the DDA algorithm.
 The cells that make up the points of the rasterized line are used as origin points from where traversal should fan out for that slice.
@@ -680,7 +682,7 @@ Modifying the algorithm to avoid this, especially extended to 3D, was too messy.
 
 \begin{figure}
 \begin{center}
-\includegraphics[width=\textwidth]{Images/chess-metric.pdf}
+\includegraphics[width=0.75\textwidth]{Images/chess-metric.pdf}
 \captionfonts
 \caption[Chessboard Metric]{The chessboard metric in action.}
 \label{fig:chess-metric}
@@ -690,7 +692,7 @@ Modifying the algorithm to avoid this, especially extended to 3D, was too messy.
 The final idea involves taking axis aligned slices of the grid perpendicular to the highest magnitude component of the view vector.
 It is a simple algorithm compared to the previously tried solutions and can be based on existing convex polygon rasterization algorithms but extended to 3D.
 This is not a true front to back traversal but it provides the needed results.
-In figure \ref{fig:frustum-iter}, cell 8 is traversed after cell 7, but cell 8 is closer in distance.
+In Figure \ref{fig:frustum-iter}, cell 8 is traversed after cell 7, but cell 8 is closer in distance.
 However, cell 7 will never occupy space in front of cell 8, so any objects in cell 7 will never be drawn in front of cell 8.
 Cell 8 will be occluded by objects in cell 3 and 0, while cell 7 will most likely by occluded by objects in cells 6, 5, 2, 1, and 0.
 As long as a cell is traversed after the cells that could potentially occlude it, the query results will be optimal and not create false positives.
@@ -701,7 +703,7 @@ This depth sorting can even be parallelized by using a separate thread per cell,
 
 \begin{figure}
 \begin{center}
-\includegraphics[width=\textwidth]{Images/frustum-iter.pdf}
+\includegraphics[width=0.75\textwidth]{Images/frustum-iter.pdf}
 \captionfonts
 \caption[View Frustum Traversal]{Occlusion order traversal.}
 \label{fig:frustum-iter}
@@ -713,13 +715,13 @@ This depth sorting can even be parallelized by using a separate thread per cell,
 
 In practice, view frustums are very wide.
 A camera using a standard 90 degree vertical field of view on a 16:9 wide screen monitor will create a horizontal field of about 160 degrees.
-Wide frustums cause cells that should have been occluded to be traversed before the cells that occlude them as shown in figure \ref{fig:wide-frustum-iter}.
+Wide frustums cause cells that should have been occluded to be traversed before the cells that occlude them as shown in Figure \ref{fig:wide-frustum-iter}.
 In this case cell 0 is most likely occluded by cells 3, 4, and 5.
 Even if the camera is staring straight at a wall, cells 0, 1, and 2 will falsely pass the occlusion queries because the wall in cell 3 hasn't been rendered to the z buffer yet.
 
 \begin{figure}
 \begin{center}
-\includegraphics[width=\textwidth]{Images/wide-frustum.pdf}
+\includegraphics[width=0.75\textwidth]{Images/wide-frustum.pdf}
 \captionfonts
 \caption[Incorrect Wide View Frustum Traversal]{Incorrect traversal of angled wide view frustum.}
 \label{fig:wide-frustum-iter}
@@ -727,19 +729,19 @@ Even if the camera is staring straight at a wall, cells 0, 1, and 2 will falsely
 \end{figure}
 
 Splitting the frustum into pieces solves this.
-The splitting point is centered around the cell where the eye is located as shown in figure \ref{fig:correct-wide-frustum-iter}.
+The splitting point is centered around the cell where the eye is located as shown in Figure \ref{fig:correct-wide-frustum-iter}.
 This creates new convex volumes out of the split view frustum.
 In 3D, the frustum is split into 8 pieces by the x, y, and z planes.
 A convex polygon plane clipping algorithm will do the trick.
 The volumes are now traversed in a fan out order around the center cell.
-In the figure below, first the central volume is traversed, and then cells 22, 23, and 24 are traversed afterwards.
+In Figure \ref{fig:correct-wide-frustum-iter}, first the central volume is traversed, and then cells 22, 23, and 24 are traversed afterwards.
 This keeps the correct occluder order prevents cells from being falseley determined to be visible.
 
 \begin{figure}
 \begin{center}
-\includegraphics[width=\textwidth]{Images/wide-traversal.pdf}
+\includegraphics[width=0.75\textwidth]{Images/wide-traversal.pdf}
 \captionfonts
-\caption[Corret Wide View Frustum]{Correct traversal of split angled wide view frustum.}
+\caption[Correct Wide View Frustum]{Correct traversal of split angled wide view frustum.}
 \label{fig:correct-wide-frustum-iter}
 \end{center}
 \end{figure}
@@ -761,14 +763,17 @@ Lockless sets that are part of Intel Thread Building Blocks do not allow safe lo
 
 \subsection{The Rasterizing Algorithm}
 \label{the-rasterizing-algorithm}
-The algorithm does nt handle just frustums, but any convex polygon with any arbitrary amount of points and edges.
+The algorithm does not handle just frustums, but any convex polygon with any arbitrary amount of points and edges.
 This allows the algorithm to handle the frustum being clipped against the level bounds and sliced into 8 peices to handle wide and angled views.
 
 The algorithm is optimized enough that it is able to quickly process very dense grids.
 It has been tested on grids of 1,000 x 1,000 x 1,000 cells and the framerate stayed at about 40 FPS in the worst case, and at about 100 in other cases.
-It was tested by making OpenGL render a point at the center of what would be a cell in 3D space.
-Such a dense grid is not practical for the visibility culling algorithm itself.
-It would take over 59 gigabytes in RAM to store one billion 64 bit NULL pointers for a completely empty scene.
+This means there one billion cells total.
+The algorithm was tested by making OpenGL render a point at the center of what would be a cell in 3D space.
+
+In practice, the scene is never subdivided by that fine a grid anyway.
+Grids would typically have dimensions of not more than 100 x 100 x 100.
+It would take over 59 gigabytes in RAM to store one billion 64 bit NULL pointers for a completely empty scene with a grid of 1,000 x 1,000 x 1,000 cells.
 Since the hardware must also render a box for each cell, the performance would drop siginificantly rendering that many boxes and later retreiving occlusion query results even if a system had that much memory.
 Thus, the CPU is able to rasterize dense grids with relative ease, while memory and GPU power are the bottlenecks requiring the grids to be even less dense in practice.
 
@@ -779,7 +784,7 @@ In this case cells that are outside of the view frustum get traversed, creating 
 The algorithm works by taking a convex polygon as shown in Figure \ref{fig:scene-frust} and processing it slice by slice down the grid as shown in Figure \ref{fig:scene-frust-slice}.
 Each slice is now a 2D polygon, so a modified 2D rasterizer is used similar to existing 2D convex polygon rasterizing algorithms.
 For each row in the slice, the range of cells to be traversed is computed as shown in Figure \ref{fig:scene-frust-row}.
-The full implementation is presented in the appendix.
+The full implementation is presented in the appendix. (TODO, write that section and have a ref pointing to it)
 
 \begin{figure}
 \begin{center}
@@ -838,148 +843,175 @@ This is done in order of which changes cause the worst performance hit for the G
 It should also be possible to quickly depth sort the meshes being rendered to avoid some overdraw but the objects are already sorted well enough when the view frustum is rasterized front to back.
 True depth sort is only needed for alpha blended objects.
 
-\subsection {The Visibility Culling / Depth Pass}
+\subsection{The Visibility Culling / Depth Pass}
 \label{the-visibility-culling-depth-pass}
 
 The first phase involves performing a depth pre pass while performing the occlusion queries.
 The depth pre pass renders solid objects to the z buffer with color writing disabled so the complex pixel shaders that compute lighting and color are not run.
-This is used for the occlusion queries during this stage as well as for preventing pixel shader overdraw later.
+This is used for the occlusion queries during this stage as well as for preventing pixel shader overdraw when the scene is later rendered with lighting and color calculations.
 For each unoccluded cell that is traversed during this phase, its objects are rendered to the z buffer as well as being added to the main render queue.
+
+\subsubsection{Retreiving Cell Query Results}
+\label{retreiving-cell-query-results}
 
 First, the query results from last frame are gathered.
 This updates the visibility status of cells for the current frame.
 Since the cell query results are used next frame, objects may pop in a frame late.
-This is unnoticeable at high frame rates due to how little time this takes, and is a common sacrifice other engines make when using occlusion queries.
-This is the part of the algorithm that takes up about 25\% CPU time.
+This is unnoticeable at high frame rates due to how little time a frame lasts.
+This is a common sacrifice other engines make when using occlusion queries.
 Query results may take upto four frames to be ready in some cases, so even using the results next frame rather than the current frame causes a CPU stall.
+This makes retreiving query results from last frame take up about 25\% CPU time.
 The frame rate still remains high, sometimes reaching 300 FPS if running only queries but not rendering anything.
-The call to retrieve the query result blocks the CPU until the result is available, but it is possible to first check if the result is available before making the blocking call.
+It is possible to first check if the query result is available before making the blocking call.
 This is avoided to keep the algorithm simpler and avoid rendering frames where the object is not visible yet.
 This stall can be inconsequential if a separate thread retrieves the query results while the engine is left to run Physics, AI, sound, and other subsystems.
+
+\subsubsection{Storing Query Results}
+\label{storing-query-results}
 
 The cells keep track of their last visible frame by storing a 64 bit unsigned frame counter.
 A 64 bit unsigned integer can store more atoms than there are in the universe.
 Even if the renderer is running at 500 FPS, it will take 15,768,000,000 years for this counter to roll over.
 The scene itself keeps track of the current frame counter in its own 64 bit unsigned integer.
 When a cell query is retrieved, it writes the current frame counter of the scene as the last visible frame.
-This way it's unnecessary to to iterate over all cells every frame to reset their visibility status.
+This way it is unnecessary to to iterate over all cells every frame to reset their visibility status.
 
-\begin{lstlisting}
-//TODO: fix this
-isCellVisibleLastFrame()
-	return cell.lastVisibleFrame == scene.currentFrame - 1;
-\end{lstlisting}
+\subsubsection{Occluder Effectiveness}
+\label{occluder-effectiveness}
 
 In order to prevent too much work during the depth pre pass, the artists can specify how the object should be rendered during this phase.
-This is one of the only settings artists need to tweak in the environment to push a little extra performance.
+This, along with grid dimensions, is the only setting artists need to set in order to acheive high performance.
 The three settings for an object are to always render, sometimes render, and to never render.
+Figures \ref{fig:hangar-corner} and \ref{fig:hangar-entrance_} provide good examples of what objects are given what setting.
 An object can be marked as an essential occluder that must always be rendered if its cell is visible.
 This is for objects like walls, terrain, or any other objects that keep the world water-tight.
 These are objects that must populate the z buffer in order for cells behind to be properly occluded.
-The second setting of "sometimes" is reserved for fairly large detail adding objects that would be in the middle of rooms, such as crates, columns, or trees.
-The deferred renderer in the game Space Marine limits the depth pre pass to only 75 objects in order to prevent too much work during this phase. %(http://www.slideshare.net/blindrenderer/rendering-tech-of-space-marinekgc-2011)  
+
+The second setting of ``sometimes'' is reserved for fairly large detail adding objects that would be in the middle of rooms, such as crates, columns, or trees.
+The renderer in the game Space Marine limits the depth pre pass to only 75 objects in order to prevent too much work during this phase.\cite{spaceMarine}
 This engine only adds objects marked to render sometimes if there are not already 75 objects rendered in the depth pass.
 Since the scene is traversed front to back, the objects close to the camera and likely to contribute to occlusion usually make it while the further away objects are avoided.
-The third setting of "never" is for the tiny objects that add detail.
+
+The third setting of ``never'' is for the tiny objects that add detail, such as a clock on a wall.
 In a fully detailed environment it is likely that there will be very many of these objects.
 They are likely to not contribute much to the occlusion and rendering them during this phase can be a waste.
 
 \begin{figure}
 \begin{center}
-\includegraphics[width=\textwidth]{Images/HangarCorner.jpg}
+\includegraphics[width=0.9\textwidth]{Images/HangarCorner.jpg}
 \captionfonts
-\caption[Hangar Corner]{Hangar corner}
+\caption[Hangar Corner]{Here the walls, ceiling, and floors are marked to always render during the depth pre pass.  The fighter jets inside the hangars are marked to sometimes render.  The lamps on the floor and clamps holding the jets in place are marked to never render.}
 \label{fig:hangar-corner}
 \end{center}
 \end{figure}
 
-In figure \ref{fig:hangar-corner} the walls, ceiling, and floors are marked to always render.
-The fighter jets inside the hangars are marked to sometimes render.
-The lamps on the floor and clamps holding the jets in place are marked to never render.
-
 \begin{figure}
 \begin{center}
-\includegraphics[width=\textwidth]{Images/HangarEntrance.jpg}
+\includegraphics[width=0.9\textwidth]{Images/HangarEntrance.jpg}
 \captionfonts
-\caption[Hangar Entrance]{Hangar entrance}
+\caption[Hangar Entrance]{Here the building, underground tunnel walls, and the terrain are set to always render during the depth pre pass.  The teapots and jets are set to sometimes render.  The red lamps on the building are set to never render.}
 \label{fig:hangar-entrance_}
 \end{center}
 \end{figure}
 
-In the outdoor area of figure \ref{fig:hangar-entrance_}, The building, underground tunnel walls, and the terrain are set to always render.
-The teapots and jets are set to sometimes render.
-The red lamps on the building are set to never render.
+\subsubsection{Pseudocode}
+\label{pseudo-code-1}
 
-The following pseudocode shows the algorithm.
+The following pseudocode shows the algorithm as described earlier.
+The scene stores a 64 bit unsigned frame counter to store the current frame.
+For each cell, the scene also stores a corresponding 64 bit unsigned integer storing the last frame the cell was marked to be visible.
 
 \begin{lstlisting}
-//TODO: make this be some C++ and make it fit horizintally properly
-uint64_t frameCounter
+class Scene {
+  uint64_t frameCounter;
+  uint64_t cellLastVisibleFrames[numberOfCells];
+};
+\end{lstlisting}
 
+The cell queries are queued up and retreived next frame.
+The cell index needs to be stored as well as a reference to the hardware occlusion query for what ever graphics API is used.
+
+\begin{lstlisting}
+struct Query {
+  int cellIndex;
+  void * queryReference;
+};
+\end{lstlisting}
+
+The algorithm starts by retreiving results from all queued up cell queries from last frame.
+If a cell query result was positive, the cell is marked to have been visible during the frame for the query.
+
+\begin{lstlisting}
 //retreive cell queries from last frame
 for each query from last frame
-	get query result
-	if any samples passed
-		mark cell as visible for frameCounter
+  get query result
+  if any samples passed
+    cellLastVisibleFrames[query.cellIndex] = frameCounter
 
+//now advance the current frame counter
 ++frameCounter
+\end{lstlisting}
 
+Now the rendering of objects to the depth buffer is about to start, as well as the querying of the traversed cells for this frame.
+Color write should be disabled.
+Blending should be disabled since only solid geometry is rendered during this stage.
+Depth test should be enabled with a depth function of less than.
+Depth write should be enabled when rendering objects, and disabled when rendering a cell during a cell query.
+Backface culling should be disabled when rendering a cell when the camera is inside of a cell or else the cell won't be visible.
+
+\begin{lstlisting}
 disable blend
-//we don’t need to write colors in this phase, just populate the z buffer
+//we do not need to write colors in this phase, just populate the z buffer
 disable color write
 enable depth test
 depth func less
-set cull face to back
-						
+
 for each grid cell traversed
-	if cell is not empty
+  if cell is not empty
+    disable backface culling
+    disable depth write
 
-disable face cull
-		disable depth write
-		
-//cell is completely invisible, but still tested in queries			
-		begin occlusion query
-		draw cell
-		end occlusion query			
-	
-if cell was marked visible during frameCounter - 1				
-			for each node in cell
-				add node to render queue
+    //cell is completely invisible, but still tested in queries	
+    begin occlusion query
+    draw cell
+    end occlusion query
+    queue up the query to be retreived next frame
 
-				if node has a solid unblended material
-					if node marked to always render 
-or (sometimes render and numRenderedDepthPass < 75)
-						add node to depth pass queue
-	
-			//now that we are drawing the objects, reenable depth write
-			enable depth write
-			enable face culling
-			
-			sort depth pass queue by shader, some textures, and mesh
-			//if using displacement maps, those will be needed during this phase
-			//diffuse, normal, specular maps, etc... not needed here
+    //if cell was marked visible last frame
+    if cellLastVisibleFrames[cell.index] == frameCounter - 1
+      for each node in cell
+        add node to render queue
+        if node has a solid unblended material
+          if node marked to always render 
+              or (sometimes render and numObjectsForDepthPass < 75)
+            add node to depth pass queue
+            ++numObjectsForDepthPass
 
-			begin conditional render using cell query			
-				for each mesh in depth pass queue
-					draw mesh				
-				end conditional render from cell query
+      //now that we are drawing the objects, reenable depth write
+      enable depth write
 
-			clear depth pass queue
+      sort depth pass queue by shaders, any needed textures, and meshes
+
+      //use the cell query just performed to do a conditional render and
+      //avoid drawing these objects if the cell is not visible
+      begin conditional render using cell query
+      for each mesh in depth pass queue
+        draw mesh
+      end conditional render from cell query
+
+      clear depth pass queue
 \end{lstlisting}
-
 
 \subsection {The Rendering}
 \label{the-rendering}
 
-Now all objects from cells marked as visible in the previous frame are gathered up and ready to be rendered in color.
+The occlusion querying and depth pre pass is the heart of the algorithm in this paper.
+All objects that are most likely visible are now queued up and ready to be rendered in color.
 They should be sorted by render state as mentioned earlier.
-A deferred shading renderer is used for this project, but any kind of renderer can be used.
-In this case, solid objects are all queued up in one render state list.
-This is a great opportunity to use the batching API available on modern graphics cards to reduce draw calls and render all objects of one type in 1 call.
+Any kind of renderer can be used at this point.
+This is a great opportunity to use the batching API available on modern graphics cards to reduce draw calls and render all objects of one type in one call.
 The depth write and depth test should still be enabled at this time since not all objects were added to the z buffer during the depth pre pass.
-The depth test function should be set to less than or equal.  All lights to be rendered during the lighting pass are queued up in another list.
-Transparent objects can be queued up in another list in the occlusion order mentioned earlier and rendered using forward rendering.
-The same grid that stores objects in the scene can be queried for which lights affect objects to be rendered during forward rendering.
+The depth test function should be set to less than or equal in order to avoid fragment shader overdraw by using the already populated z buffer.
 
 \subsection {Spreading Queries}
 \label{spreading-queries}
