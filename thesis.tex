@@ -633,7 +633,7 @@ Figure \ref{fig:algorithm-03} shows a full color scene with objects being render
 \label{Overview}
 The view frustum culling occurs on the grid cells only, rather than on each individual object in the scene.
 This allows all objects grouped in a cell to be culled out at once rather than making the CPU check every object individually.
-If a cell is right at the border of the view frustum and a few objects inside the cell aren't in the frustum, it's not a problem to have the GPU needlessly render them.
+If a cell is right at the border of the view frustum and a few objects inside the cell aren not in the frustum, it is not a problem to have the GPU needlessly render them.
 The work done by the CPU checking all objects in a cell will cause a higher performance drop than having the GPU draw a few wasted objects.
 This algorithm allows for large scenes with fine enough grids that there will usually be very few wasted objects compared to the immense number of objects that do get rendered.
 The space should be subdivided by the grid in a way that renders as few wasted objects as possible.
@@ -688,8 +688,8 @@ Modifying the algorithm to avoid this, especially extended to 3D, was too messy.
 \end{figure}
 
 The final idea involves taking axis aligned slices of the grid perpendicular to the highest magnitude component of the view vector.
-It's a simple algorithm compared to the previously tried solutions and can be based on existing convex polygon rasterization algorithms but extended to 3D.
-This isn't a true front to back traversal but it provides the needed results.
+It is a simple algorithm compared to the previously tried solutions and can be based on existing convex polygon rasterization algorithms but extended to 3D.
+This is not a true front to back traversal but it provides the needed results.
 In figure \ref{fig:frustum-iter}, cell 8 is traversed after cell 7, but cell 8 is closer in distance.
 However, cell 7 will never occupy space in front of cell 8, so any objects in cell 7 will never be drawn in front of cell 8.
 Cell 8 will be occluded by objects in cell 3 and 0, while cell 7 will most likely by occluded by objects in cells 6, 5, 2, 1, and 0.
@@ -751,17 +751,17 @@ If an object occupies multiple cells it can potentially get added multiple times
 Keeping track of a 64 bit unsigned query id counter can prevent this.
 The main scene can store a query counter, and increment it every time a query occurs.
 The objects returned by the query can keep a query counter within them as well.
-If the object's counter is less than the scene's counter, then the object hasn't been added to the query results yet.
-As the object is added, its counter is set to the scene's counter and any other cells that contain the object won't needlessly duplicate the object in the query.
+If the object's counter is less than the scene's counter, then the object has not been added to the query results yet.
+As the object is added, its counter is set to the scene's counter and any other cells that contain the object will not needlessly duplicate the object in the query.
 
 In a multithreaded engine, when many queries can occur in parallel, a lockless set of query ids per object can work.
 If a query id is already in the object's query set, the object can be ignored.
 After the query results are done, the query id can be removed from the set, keeping the set from growing.
-Lockless sets that are part of Intel Thread Building Blocks don't allow safe lockless removal, so it may be best to clear these sets at some synchronization point such as the end of a frame to prevent them from growing too large.\cite{tbb}
+Lockless sets that are part of Intel Thread Building Blocks do not allow safe lockless removal, so it may be best to clear these sets at some synchronization point such as the end of a frame to prevent them from growing too large.\cite{tbb}
 
 \subsection{The Rasterizing Algorithm}
 \label{the-rasterizing-algorithm}
-The algorithm doesn't handle just frustums, but any convex polygon with any arbitrary amount of points and edges.
+The algorithm does nt handle just frustums, but any convex polygon with any arbitrary amount of points and edges.
 This allows the algorithm to handle the frustum being clipped against the level bounds and sliced into 8 peices to handle wide and angled views.
 
 The algorithm is optimized enough that it is able to quickly process very dense grids.
@@ -814,26 +814,26 @@ The full implementation is presented in the appendix.
 \subsection{Render State Sorting}
 \label {render-state-sorting}
 Other rendering algorithms that make use of hardware occlusion queries usually benefit from having all objects sorted front to back.
-(TODO: I'm going to reword this section with the dogs and the garbage cans)
-This way a tree in front of a dog can potentially occlude the dog in figure \ref{fig:a-scene}.
-Then a tree farther in the distance may be occluded by a garbage can.
-This would require the objects to be drawn in the order, Tree A, Dog, Garbage Can, Tree B.
+In Figure \ref{fig:a-scene} Tree A should be drawn before the Tank since it can potentially occlude the tank.
+After that the Person should be tested against the Tank and Tree A.
+Then Tree B gets tested against everything else.
+This would require the objects to be drawn in the order, Tree A, Tank, Person, Tree B.
 
 \begin{figure}
 \begin{center}
-\includegraphics[width=\textwidth]{Images/sample-scene.pdf}
+\includegraphics[width=0.75\textwidth]{Images/sample-scene.pdf}
 \captionfonts
 \caption[A scene]{A scene.}
 \label{fig:a-scene}
 \end{center}
 \end{figure}
 
-Rendering performance would suffer since these objects aren't sorted in an optimal render state order, but in occlusion order.
+Rendering performance would suffer since these objects are not sorted in an optimal render state order, but in occlusion order.
 When rendering a large number of objects, they should be sorted in a way that causes the least amount of change in the render state.
-It would be better to render Tree A, Tree B, then switch to the shader and textures that render the dog, then do the same for the garbage can.
+It would be better to render Tree A, Tree B, then switch to the shader and textures that render the tank, then do the same for the person.
 The algorithm in this paper avoids this problem and allows objects to be queued up and then sorted by their render state.
 
-The deferred shading renderer used for this project sorts objects first by shader, then textures, then by the instance of mesh.
+The renderer used for this project sorts objects first by shader, then textures, then by the instance of mesh.
 This is done in order of which changes cause the worst performance hit for the GPU.\cite{d3d10-sys}
 It should also be possible to quickly depth sort the meshes being rendered to avoid some overdraw but the objects are already sorted well enough when the view frustum is rasterized front to back.
 True depth sort is only needed for alpha blended objects.
@@ -842,18 +842,19 @@ True depth sort is only needed for alpha blended objects.
 \label{the-visibility-culling-depth-pass}
 
 The first phase involves performing a depth pre pass while performing the occlusion queries.
-The depth pre pass renders solid objects to the z buffer with color writing disabled so the complex pixel shaders of the later stages aren't run.
+The depth pre pass renders solid objects to the z buffer with color writing disabled so the complex pixel shaders that compute lighting and color are not run.
 This is used for the occlusion queries during this stage as well as for preventing pixel shader overdraw later.
 For each unoccluded cell that is traversed during this phase, its objects are rendered to the z buffer as well as being added to the main render queue.
 
-First, the query results from last frame are gathered so they can be used this frame to know whether a cell was found visible or not.
+First, the query results from last frame are gathered.
+This updates the visibility status of cells for the current frame.
 Since the cell query results are used next frame, objects may pop in a frame late.
 This is unnoticeable at high frame rates due to how little time this takes, and is a common sacrifice other engines make when using occlusion queries.
 This is the part of the algorithm that takes up about 25\% CPU time.
 Query results may take upto four frames to be ready in some cases, so even using the results next frame rather than the current frame causes a CPU stall.
 The frame rate still remains high, sometimes reaching 300 FPS if running only queries but not rendering anything.
 The call to retrieve the query result blocks the CPU until the result is available, but it is possible to first check if the result is available before making the blocking call.
-This is avoided to keep the algorithm simpler and avoid rendering frames where the object isn't visible yet.
+This is avoided to keep the algorithm simpler and avoid rendering frames where the object is not visible yet.
 This stall can be inconsequential if a separate thread retrieves the query results while the engine is left to run Physics, AI, sound, and other subsystems.
 
 The cells keep track of their last visible frame by storing a 64 bit unsigned frame counter.
@@ -877,10 +878,10 @@ This is for objects like walls, terrain, or any other objects that keep the worl
 These are objects that must populate the z buffer in order for cells behind to be properly occluded.
 The second setting of "sometimes" is reserved for fairly large detail adding objects that would be in the middle of rooms, such as crates, columns, or trees.
 The deferred renderer in the game Space Marine limits the depth pre pass to only 75 objects in order to prevent too much work during this phase. %(http://www.slideshare.net/blindrenderer/rendering-tech-of-space-marinekgc-2011)  
-This engine only adds objects marked to render sometimes if there aren't already 75 objects rendered in the depth pass.
+This engine only adds objects marked to render sometimes if there are not already 75 objects rendered in the depth pass.
 Since the scene is traversed front to back, the objects close to the camera and likely to contribute to occlusion usually make it while the further away objects are avoided.
 The third setting of "never" is for the tiny objects that add detail.
-In a fully detailed environment it's likely that there will be very many of these objects.
+In a fully detailed environment it is likely that there will be very many of these objects.
 They are likely to not contribute much to the occlusion and rendering them during this phase can be a waste.
 
 \begin{figure}
@@ -1005,14 +1006,14 @@ However, having too fine a grid can also be bad for performance overall.
 The frustum rasterization algorithm has no problem with traversing grids as large as 1000 x 1000 x 1000 cells.
 The querying and rendering of individual cells is the bottleneck.
 Depending on the camera position and viewing angle, the number of traversed cells in a fine grid can range from about 500 to 60,000.
-There isn't a good way to batch all of the cubes that get rendered for the cell queries into a single draw call.
+There is not a good way to batch all of the cubes that get rendered for the cell queries into a single draw call.
 The queries happen in between rendering a group of objects to the depth buffer and there seems to be no way to have a query for each individual object in a batch at the moment.
 In the worst case, that many draw calls being made causes severe performance drops down to about 4 FPS.
 
 One solution is to try to group far away cells into one query.
 It may be possible to modify the frustum rasterizing algorithm to support this in the future.
 The grid could be rasterized more like a hierarchical octree.
-Any far way grouped cells that are visible can then be subdivided into finer cells in later frames to filter out the portions of the scene that aren't visible.
+Any far way grouped cells that are visible can then be subdivided into finer cells in later frames to filter out the portions of the scene that are not visible.
 This would take considerable effort due to the way the rasterizing algorithm is currently built to traverse row by row in the grid.
 A simpler solution is to limit the number of queries per frame.
 A limit of about 3000 to 4000 produces good results.
@@ -1020,7 +1021,7 @@ Query results now need to last multiple frames.
 The algorithm is becoming similar to the Coherent Hierarchical Culling algorithm, in that results of queries are likely to not change too much between frames that are close by in time. 
 The current algorithm allows successful visibility queries to last for about 30 frames and failed invisible cell queries to last about 2 frames.
 A lower number for invisible cells is needed to avoid waiting too long to let previously invisible cells to have their objects pop in noticeably while moving through the scene.
-Now if a query result is still valid, the cell doesn't need to be re-queried and cells that haven't been queried in previous frames have a chance.
+Now if a query result is still valid, the cell does not need to be re-queried and cells that have not been queried in previous frames have a chance.
 This can at cause slightly more noticeable pop in of objects while moving since some cells get queried a few frames later at the cost of keeping the frame rate higher as shown in \ref{fig:hall-doorway}.
 The frame rate being high reduces the real time it takes for an object to pop in, making it less noticeable anyway, so this tends to be a good tradeoff.
 
@@ -1051,7 +1052,7 @@ If 40,000 cells need to be queried, and nonvisible cell results last only 2 fram
 \end{figure}
 
 Extending the duration of query results when the query cap is hit, as well as offsetting the duration by a random amount, helps avoid the problem of query starvation.
-It's possible to keep track of how many frames in a row have hit the query cap and base the duration extension on this amount.
+It is possible to keep track of how many frames in a row have hit the query cap and base the duration extension on this amount.
 After a few frames, all cells that should be visible have had a chance to be queried and the scene looks correct.
 The popping artifacts stay relatively unnoticeable.
 
