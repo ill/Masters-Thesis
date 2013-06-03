@@ -1008,8 +1008,8 @@ for each grid cell traversed
 The occlusion querying and depth pre pass is the heart of the algorithm in this paper.
 All objects that are most likely visible are now queued up and ready to be rendered in color.
 They should be sorted by render state as mentioned earlier.
-Any kind of renderer can be used at this point.
 This is a great opportunity to use the batching API available on modern graphics cards to reduce draw calls and render all objects of one type in one call.
+Any kind of renderer can be used at this point.
 The depth write and depth test should still be enabled at this time since not all objects were added to the z buffer during the depth pre pass.
 The depth test function should be set to less than or equal in order to avoid fragment shader overdraw by using the already populated z buffer.
 
@@ -1047,14 +1047,19 @@ It may be possible to modify the frustum rasterizing algorithm to support this i
 The grid could be rasterized more like a hierarchical octree.
 Any far way grouped cells that are visible can then be subdivided into finer cells in later frames to filter out the portions of the scene that are not visible.
 This would take considerable effort due to the way the rasterizing algorithm is currently built to traverse row by row in the grid.
+
 A simpler solution is to limit the number of queries per frame.
 A limit of about 3000 to 4000 produces good results.
 Query results now need to last multiple frames.
-The algorithm is becoming similar to the Coherent Hierarchical Culling algorithm, in that results of queries are likely to not change too much between frames that are close by in time. 
+The algorithm is becoming similar to the Coherent Hierarchical Culling algorithm.\cite{CHC, CHCpp}
+We are now assuming that results of queries are likely to not change too much between frames that are close by in time. 
+
 The current algorithm allows successful visibility queries to last for about 30 frames and failed invisible cell queries to last about 2 frames.
-A lower number for invisible cells is needed to avoid waiting too long to let previously invisible cells to have their objects pop in noticeably while moving through the scene.
-Now if a query result is still valid, the cell does not need to be re-queried and cells that have not been queried in previous frames have a chance.
-This can at cause slightly more noticeable pop in of objects while moving since some cells get queried a few frames later at the cost of keeping the frame rate higher as shown in \ref{fig:hall-doorway}.
+A lower number for invisible cells is needed to avoid waiting too long to let previously invisible cells become visible.
+Too high a number would cause noticeable object popping in scenes full of motion.
+Now if a query result is still valid, the cell does not need to be re-queried.
+Cells that have not been queried in previous frames have a chance.
+This can cause slightly more noticeable pop in of objects while moving since some cells get queried a few frames later at the cost of keeping the frame rate higher as shown in \ref{fig:hall-doorway}.
 The frame rate being high reduces the real time it takes for an object to pop in, making it less noticeable anyway, so this tends to be a good tradeoff.
 
 \begin{figure}
@@ -1070,7 +1075,7 @@ A high frame rate and an action packed game help ensure this artifact is hard to
 \subsection {Query Starvation}
 \label{query-starvation}
 
-When a large amount of cells needs to be queried, some cells never have a chance and patches of the world go missing \ref{fig:missing-patches}.
+When a large amount of cells needs to be queried, some cells never have a chance and patches of the world go missing as shown in Figure \ref{fig:missing-patches}.
 Cells early in the frustum traversal whose query results have expired eat up the queries that farther away cells need to become visible.
 If 40,000 cells need to be queried, and nonvisible cell results last only 2 frames, those same nonvisible cells will keep executing queries.
 
@@ -1078,7 +1083,7 @@ If 40,000 cells need to be queried, and nonvisible cell results last only 2 fram
 \begin{center}
 \includegraphics[width=\textwidth]{Images/MissingPatches.jpg}
 \captionfonts
-\caption[Missing patches]{Missing patches}
+\caption[Missing patches]{Parts of the terrain go missing. Cells containing those objects never have a chance to be queried.}
 \label{fig:missing-patches}
 \end{center}
 \end{figure}
@@ -1088,16 +1093,61 @@ It is possible to keep track of how many frames in a row have hit the query cap 
 After a few frames, all cells that should be visible have had a chance to be queried and the scene looks correct.
 The popping artifacts stay relatively unnoticeable.
 
-The following pseudocode shows how the current implementation takes into account the number of frames in a row the query cap was hit.  The invisibilityDurationGrowth variable should be smaller than the visibilityDurationGrowth variable to keep the previously described popping artifacts at a minimum while moving.
+We are now storing the last frame that the cell query will be valid ahead in time.
+It is also necessary to store if the cell was visible or not.
+The 64th bit can just be a one or a zero to store a boolean of the query result.
+Now there are only 63 used bits to store the query frame, which is still more than enough.
+The bit layout is illustrated in Figure \ref{fig:query-bits}.
+
+\begin{figure}
+\begin{center}
+\includegraphics[width=\textwidth]{Images/QueryBits.pdf}
+\captionfonts
+\caption[Query Results Bit Layout]{The bit layout of stored query results. Bit 63 stores whether or not the cell is visible. The rest of the bits store the last frame until the cell needs to be requried again.}
+\label{fig:query-bits}
+\end{center}
+\end{figure}
+
+The following pseudocode shows how the current implementation takes into account the number of frames in a row the query cap was hit.
+This is a slight modification of the previous pseudocode that was retrieving cell query restuls.
+The invisibilityDurationGrowth variable should be smaller than the visibilityDurationGrowth variable to keep the previously described popping artifacts at a minimum while moving.
 
 \begin{lstlisting}
-//TODO: fix this code
+//encodes or decodes the cell's frame given a 64 bit integer
+uint64_t codeFrame(uint64_t frame) {
+  return 0x7FFFFFFFFFFFFFFF & frame;
+}
+
+//encodes the 64th to store a boolean value
+uint64_t encodeVisible(bool frame) {
+  return frame ? 0x8000000000000000 : 0;
+}
+
+//decodes the 64th bit to retreive a boolean value
+bool decodeVisible(uint64_t frame) {
+  return (0x8000000000000000 & frame) != 0;
+}
+
+//retreive cell queries from last frame
 for each query from last frame
-	get query result
-	if any samples passed
-		mark cell as visible for frameCounter + (visibilityDuration + visibilityDurationGrowth * numFramesOverflowed) + rand(0, numFramesOverflowed * 2);
-	else
-		mark cell as invisible for frameCounter + (invisibilityDuration + invisibilityDurationGrowth * numFramesOverflowed) + rand(0, numFramesOverflowed * 2);
+  get query result
+  if any samples passed
+    cellFrame = frameCounter 
+      + (visibilityDuration + visibilityDurationGrowth * numFramesOverflowed) 
+      + rand(0, numFramesOverflowed * 2)
+
+    visible = true
+  else
+    cellFrame = frameCounter 
+      + (invisibilityDuration + invisibilityDurationGrowth * numFramesOverflowed) 
+      + rand(0, numFramesOverflowed * 2)
+    
+    visible = false
+
+  //now store the query result and frame
+  cellLastVisibleFrames[query.cellIndex] = codeFrame(cellFrame) | encodeVisible(visible)
+
+//now advance the current frame counter
 ++frameCounter
 \end{lstlisting}
 
@@ -1107,78 +1157,112 @@ This happens when the query cap has been reached so the visible cell is now invi
 This is easily avoided by ignoring the visibility cap for visible cells that need to be re-queried.
 This happens rarely enough that only about 2 to 30 cells may sometimes need to violate the cap and there is no negative impact on performance.
 
-The following pseudocode shows modifications to the previous algorithm.
-
+The following pseudocode shows the previous algorithm but taking into account the new modifications.
 \begin{lstlisting}
-//TODO: fix this code
-uint64_t frameCounter
-
 //retreive cell queries from last frame
 for each query from last frame
-	get query result
-	if any samples passed
-		mark cell as visible for frameCounter + (visibilityDuration + visibilityDurationGrowth * numFramesOverflowed) + rand(0, numFramesOverflowed * 2);
-	else
-		mark cell as invisible for frameCounter + (invisibilityDuration + invisibilityDurationGrowth * numFramesOverflowed) + rand(0, numFramesOverflowed * 2);
+  get query result
+  if any samples passed
+    cellFrame = frameCounter 
+      + (visibilityDuration + visibilityDurationGrowth * numFramesOverflowed) 
+      + rand(0, numFramesOverflowed * 2)
+
+    visible = true
+  else
+    cellFrame = frameCounter 
+      + (invisibilityDuration + invisibilityDurationGrowth * numFramesOverflowed) 
+      + rand(0, numFramesOverflowed * 2)
+    
+    visible = false
+
+  //now store the query result and frame
+  cellLastVisibleFrames[query.cellIndex] = codeFrame(cellFrame) | encodeVisible(visible)
+
+//now advance the current frame counter
 ++frameCounter
 
 disable blend
-//we don’t need to write colors in this phase, just populate the z buffer
+//we do not need to write colors in this phase, just populate the z buffer
 disable color write
 enable depth test
 depth func less
-set cull face to back
-		
-set recordedOverFlow = false
-				
+
+//keep track of whether or not we hit the query limit this frame
+recordedOverFlow = false
+
 for each grid cell traversed
-	if cell is not empty
+  if cell is not empty
+    disable backface culling
+    disable depth write
 
-disable face cull
-		disable depth write
-		
-//check if it’s time to requery a cell
-if cell marked during frame <= frameCounter
-	if numQueries >= queryCap
-		if(!recordedOverflow)
-			++numFramesOverflowed
-			recordedOverflow = true
+    visible = decodeVisible(cellLastVisibleFrames[cell.index])
+    frame = codeFrame(cellLastVisibleFrames[cell.index]) 
 
-	if numQueries < queryCap or cell was marked visible
-				//cell is completely invisible, but still tested in queries
-begin occlusion query
-				draw cell
-				end occlusion query			
-	
-		//check if a cell is marked as visible and the result is still valid
-if cell was marked visible during frameCounter >= frameCounter		
-			for each node in cell
-				add node to render queue
+    //check if it’s time to requery a cell
+    if frame <= frameCounter
+      if numQueries >= queryCap
+        //record that the query cap has been hit for the frame
+        if(!recordedOverflow)
+          ++numFramesOverflowed
+          recordedOverflow = true
 
-				if node has a solid unblended material
-					if node marked to always render 
-or (sometimes render and numRenderedDepthPass < 75)
-						add node to depth pass queue
-	
-			//now that we are drawing the objects, reenable depth write
-			enable depth write
-			enable face culling
-			
-			sort depth pass queue by shader, some textures, and mesh
-			//if using displacement maps, those will be needed during this phase
-			//diffuse, normal, specular maps, etc... not needed here
+      //perform the query if the query cap hasn't been hit or if the cell was visible
+      if numQueries < queryCap or visible
+        //cell is completely invisible, but still tested in queries
+        begin occlusion query
+        draw cell
+        end occlusion query
+        queue up the query to be retreived next frame
 
-			begin conditional render using cell query			
-				for each mesh in depth pass queue
-					draw mesh				
-				end conditional render from cell query
+    //check if a cell is marked as visible and the result is still valid
+    if cellLastVisibleFrames[cell.index] >= frameCounter
+      for each node in cell
+        add node to render queue
+        if node has a solid unblended material
+          if node marked to always render 
+              or (sometimes render and numObjectsForDepthPass < 75)
+            add node to depth pass queue
+            ++numObjectsForDepthPass
 
-			clear depth pass queue
+      //now that we are drawing the objects, reenable depth write
+      enable depth write
 
-if numQueries < queryCap
-	numFramesOverflowed = 0
+      sort depth pass queue by shaders, any needed textures, and meshes
+
+      //use the cell query just performed to do a conditional render and
+      //avoid drawing these objects if the cell is not visible
+      begin conditional render using cell query
+      for each mesh in depth pass queue
+        draw mesh
+      end conditional render from cell query
+
+      clear depth pass queue
+      
+    if numQueries < queryCap
+    	numFramesOverflowed = 0
 \end{lstlisting}
 
+\section{Supporting Multiple Viewports}
+\label{supporting-multiple-viewports}
+
+Some bookkeeping is necessary for keeping track of visibility queries between frames.
+To support split screen multiplayer with multiple viewports, a separate set of query data needs to be allocated.
+Each cell stores a 64 bit unsigned integer.
+When allocating a new viewport, a new array of 64 bit integers per cell needs to be allocated.
+
+Since there is a limit to the number of queries per frame, the viewports would have to share that limit and distribute the number of queries in some way.
+Draw distance may have to be lowered to reduce the number of draw calls from objects rendered as well as the number of cells that need to be queried.
+We leave a solution for how to distribute the queries between viewports for future work.
+
+\section{Review}
+\label{review}
+
+This is a recap of the algorithm presented in the section.
+First we retrieve queued up occlusion query results from the last frame.
+Next we traverse the cells of the scene's uniform grid in occlusion order using a 3D convex polygon rasterizing algorithm.
+For each cell traversed, we perform an occlusion query for the cell.
+If the cell was determined to be visible in previous frames, objects from that cell are rendered to the z buffer only, and queued up to later be rendered in color.
+Once the scene is traversed, the objects can now be rendered in color.
 
 \chapter{Results}
 \label{results}
