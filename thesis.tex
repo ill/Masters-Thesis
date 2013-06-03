@@ -567,7 +567,11 @@ They make no mention on whether or not objects noticeably pop in late with this 
 \chapter{Visbility Culling Algorithm}
 \label{visibility-culling-algorithm}
 
-In this chapter, we describe the steps in the visibility culling algorithm. (TODO: write this paragraph when I'm done revising the chapter)
+In this chapter, we describe the steps in the visibility culling algorithm.
+Section \ref{algorithm-overview} is a general overview of the entire algorithm.
+Then, Section \ref{grid-view-frustum-culling} describes the scene traversal algorithm.
+In Section \ref{rendering} we describe the steps the algorithm takes to prepare the objects in the scene to be rendered.
+Then, in Section \ref{supporting-multiple-viewports}, we describe how to add support for multiple viewports for split screen support. 
 
 \section{Algorithm Overview}
 \label{algorithm-overview}
@@ -649,7 +653,7 @@ Cells farther from the camera get tested against the objects in front that are p
 
 \begin{figure}
 \begin{center}
-\includegraphics[width=0.75\textwidth]{Images/frustum.pdf}
+\includegraphics[width=0.75\textwidth]{Images/frustFigure.png}
 \captionfonts
 \caption[View Frustum and Occluders]{A view frustum, and the objects inside occluding each other.}
 \label{fig:vf-and-occluders}
@@ -664,9 +668,9 @@ There was difficulty in figuring out the best way to align the rays so that dupl
 
 \begin{figure}
 \begin{center}
-\includegraphics[width=0.75\textwidth]{Images/ray-traversal.pdf}
+\includegraphics[width=0.75\textwidth]{Images/rayTraversal.png}
 \captionfonts
-\caption[Ray Based Traversal]{Showing an example of ray based frustum traversal.}
+\caption[Ray Based Traversal]{Showing an example of ray based frustum traversal. The cells in front get traversed multiple times.}
 \label{fig:vf-ray-traversal}
 \end{center}
 \end{figure}
