@@ -1028,11 +1028,11 @@ If the grid is too sparse, large chunks of the hangar get rendered that should b
 \begin{center}
 \includegraphics[width=\textwidth]{Images/Hangar.jpg}
 \captionfonts
-\caption[Hangar Bay]{Hangar halls}
+\caption[Hangar Bay]{Hangar Bay}
 \label{fig:hangar-bay}
 \includegraphics[width=\textwidth]{Images/HallCorner.jpg}
 \captionfonts
-\caption[Hangar Halls]{Hangar halls}
+\caption[Hangar Halls]{Hangar Halls}
 \label{fig:hangar-halls}
 \end{center}
 \end{figure}
@@ -1293,6 +1293,7 @@ GLEW 1.9.0 was used to help with the OpenGL function bindings.
 The tested executable is built for 64 bit using Visual Studio 2012.
 
 A limited deferred shading renderer is used to display the scenes.
+A deferred shading renderer performs the lighting in a separate pass from rendering the geometry, allowing for a very large number of dynamic lights.
 The renderer is capable of performing normal mapping, specular highlights, and rendering only solid geometry.
 It's able to light the scene with point lights, spot lights, and a directional volume light for lighting up large areas.
 More features are planned for the future.
@@ -1305,12 +1306,15 @@ The scenes were designed keeping in mind the average height of a person being 1.
 3DS Max 2012 and a custom Max Script were used for exporting the scenes into a format readable by the engine.
 
 The first scene is an indoor scene with tight corridors called The Grid.
+Figures \ref{fig:grid-overview}, \ref{fig:grid-halls}, \ref{fig:grid-inner-sanctum}, and \ref{fig:grid-shaft} show the scene from various angles.
 The objects in this scene aren't textured due to time constraints, so they are covered in a high specular white shiny material with all the color being derived from colorful lighting.
 The scene only makes use of point lights, causing a large number of lights to be needed to light up the interior brightly.
 It's an area designed and duplicated in a grid like pattern to simulate a fairly large and sprawling indoor environment.
-This scene is approximately 130 x 12 x 210 units in size.
+This scene is approximately 130 x 12 x 210 meters in size.
 
 The second scene is a much larger area called Teapot Graveyard.
+Figures \ref{fig:graveyard-overview}, \ref{fig:teapot-graveyard}, \ref{fig:hangar-entrance}, \ref{fig:hangar}, \ref{fig:hall-corner}.
+The scene has also been pictured throughout the paper in Figures \ref{fig:hangar-view}, \ref{fig:hangar-peices}, \ref{fig:hangar-corner}, \ref{fig:hangar-entrance_}, \ref{fig:hangar-bay}, \ref{fig:hangar-halls}, and \ref{fig:hall-doorway}.
 It combines detailed indoor environments similar to The Grid with large outdoor areas.
 This scene makes use of all available features of the renderer.
 All objects are textured, causing extra stress to the deferred shading renderer by making it use more demanding shaders and sorting by more render states.
@@ -1318,7 +1322,7 @@ The textures are borrowed from the Perfected Doom 3 mod by Vgames, who made high
 A large number of point lights and spot lights are used for the hangar area.
 The outdoor area is a combination of several directional volume lights and randomly placed point lights.
 There is currently no heightmap terrain rendering system in place, so the terrain is composed of a set of meshes from a model that was split into 100 peices as a temporary solution.
-This scene is approximately 1250 x 750 x 1250 units in size.
+This scene is approximately 1250 x 750 x 1250 meters in size.
 
 \begin{figure}
 \begin{center}
@@ -1355,7 +1359,7 @@ This scene is approximately 1250 x 750 x 1250 units in size.
 \includegraphics[width=\textwidth]{Images/GraveyardOverview.jpg}
 \captionfonts
 \caption[Teapot Graveyard Overview]{Overview of Teapot Graveyard.}
-\label{fig:fraveyard-overview}
+\label{fig:graveyard-overview}
 
 \includegraphics[width=\textwidth]{Images/TeapotGraveyard.jpg}
 \captionfonts
@@ -1411,7 +1415,53 @@ X people were asked to try running the engine with various settings and reported
 %\end{center}
 %\end{figure}
 
-The variables are the grid dimensions, maximum queries per frame, validity duration of a visibility query, validity duration of an invisibility query, and the growth of duration for the two query results due to the number of frames in a row the query cap has been reached.
+\subsection {Variables}
+\label{variables}
+
+\subsubsection{Grid Dimensions}
+\label{grid-dimensions}
+The grid dimensions affect how well parts of the scene are occluded.
+The more a scene is subdivided, the less objects there are in the cells.
+This can positively affect performance by drawing less objects.
+
+More cells also means more queries need to be executed for the same draw distance.
+This can negatively affect performance due to the number of queries being executed.
+This can also cause more noticeable popping since the query cap can be hit, requiring a longer time until some objects become visible.
+
+\subsubsection{Maximum Queries Per Frame}
+\label{maximum-queries-per-frame}
+The query cap is meant to improve performance for high density grids by spreading the queries out over multiple frames.
+Lower numbers improve performance, but cause more noticeable popping than higher numbers.
+
+\subsubsection{Visibility Query Duration}
+\label{visibility-query-duration}
+This determines how long the results of a cell being marked as visible last.
+It is safe to assume that a cell marked as visible will stay visible for some time afterwards, and requerying this cell needlessly should be avoided.
+Higher numbers reduce the likelyhood that the query cap will be hit as often by reducing the number of queries that need to be run.
+Higher numbers can also potentially induce spikes of lower framerate since cells that are now invisible are still considered visible and unnecessary objects are being rendered.
+
+\subsubsection{Invisibility Query Duration}
+\label{invisibility-query-duration}
+This determines how long the results of a cell being marked as not visible last.
+This is kept separate from visibility query duration because non-visible cells should be checked more often in a scene full of motion.
+Visibility query duration can safely be kept high up in the thirties, but invisibility duration should be kept at about one to two frames.
+Higher numbers reduce the likelyhood that the query cap will be hit.
+Higher numbers for this also increase the popping artifacts when the camera or objects in the scene are moving due to constantly changing visibility.
+
+\subsubsection{Visibility Query Duration Growth}
+\label{visibility-query-duration-growth}
+The algorithm measures how many frames in a row the query cap has been hit.
+To avoid query starvation, query results get longer durations depending on the number of frames in a row the cap has been hit.
+Lower numbers make query starvation more likely to happen.
+Higher numbers can induce spikes of lower framerate by increasing the length of a visibility query.
+
+\subsubsection{Invisibility Query Duration Growth}
+\label{invisibility-query-duration-growth}
+This too is kept separate from visibility query duration growth so non-visible cells get checked more often.
+This number should be much lower than visibility query duration growth for the same reasons.
+When the base invisibility query duration is a low number like one frame, this variable increases it by a little bit to reduce query starvation.
+Lower numbers make query starvation more likely to happen.
+Higher numbers increase visibility popping artifacts during motion.
 
 \section {Data}
 \label{data}
