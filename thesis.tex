@@ -1418,6 +1418,11 @@ X people were asked to try running the engine with various settings and reported
 \subsection {Variables}
 \label{variables}
 
+\subsubsection{Occlusion Culling}
+\label{vars-occlusion-culling}
+Performance should increase with occlusion culling enabled.
+The frame rate is measured by viewing the scene with view frustum culling only and no occlusion culling to see if an increase in framerate occurs when occlusion culling is enabled.
+
 \subsubsection{Grid Dimensions}
 \label{grid-dimensions}
 The grid dimensions affect how well parts of the scene are occluded.
@@ -1425,7 +1430,7 @@ The more a scene is subdivided, the less objects there are in the cells.
 This can positively affect performance by drawing less objects.
 
 More cells also means more queries need to be executed for the same draw distance.
-This can negatively affect performance due to the number of queries being executed.
+In this way more subdivision can also negatively affect performance due to the number of queries being executed.
 This can also cause more noticeable popping since the query cap can be hit, requiring a longer time until some objects become visible.
 
 \subsubsection{Maximum Queries Per Frame}
@@ -1438,7 +1443,7 @@ Lower numbers improve performance, but cause more noticeable popping than higher
 This determines how long the results of a cell being marked as visible last.
 It is safe to assume that a cell marked as visible will stay visible for some time afterwards, and requerying this cell needlessly should be avoided.
 Higher numbers reduce the likelyhood that the query cap will be hit as often by reducing the number of queries that need to be run.
-Higher numbers can also potentially induce spikes of lower framerate since cells that are now invisible are still considered visible and unnecessary objects are being rendered.
+Higher numbers can also potentially induce spikes of lower framerate since cells that are now invisible are still considered visible for a few frames and unnecessary objects are being rendered.
 
 \subsubsection{Invisibility Query Duration}
 \label{invisibility-query-duration}
@@ -1463,14 +1468,26 @@ When the base invisibility query duration is a low number like one frame, this v
 Lower numbers make query starvation more likely to happen.
 Higher numbers increase visibility popping artifacts during motion.
 
-\section {Data}
-\label{data}
+\section {Test Cases}
+\label{test-cases}
 
-\subsection {The Grid Map on GTX 480 Desktop PC}
-\label{the-grid-gtx-480}
+The data is collected by measuring the framerate and noticeable popping in various test cases.
+Some tests consist of measuring only the framerate if popping is not applicable to the test.
+The tests involve moving through the scenes in various areas and looking at certain points of interest.
+Some test cases consist of moving the camera in ways that should induce popping artifacts, such as turning around quickly, or moving side to side around doorways.
+
+\subsection{The Grid Test Cases}
+\label{the-grid-test-cases}
+
+\subsubsection{Moving Throughout The Scene}
+\label{grid-moving-throught-the-scene}
+
+This test consists of moving the camera throughout the map from the starting point and going through all of the various hallways.
+This will be a good test of overall performance and whether or not popping is apparent.
 
 \begin{table}
 \begin{center}
+GPU: GTX 480.   Cell Dimensions: 5x12x5.   Number of Cells: 26x2x42.
 \begin{tabular}{|c|c|c|c|c|c|c|}
 \hline 
 &\multicolumn{2}{c|}{Visibility}&\multicolumn{2}{c|}{Invisibility}&&
@@ -1478,236 +1495,90 @@ Higher numbers increase visibility popping artifacts during motion.
 Max Queries&Duration&Growth&Duration&Growth&FPS&Pop-in
 \tabularnewline
 \hline
-1000 & 15& 4& 1& 1& 60& High
+1000 & 10& 1& 1& 1& 170& Unnoticeable
 \tabularnewline
-& 20& 6& 2& 1& 60& High
+     & 20& 4& 2& 1& 191& Unnoticeable
 \tabularnewline
-& 30& 8& 2& 2& 60& High
+     & 30& 8& 2& 2& 60& High
 \tabularnewline \hline
-2000 & 15& 4& 1& 1& 60& Medium
+2000 & 10& 4& 1& 1& 60& Medium
 \tabularnewline
-& 20& 6& 2& 1& 60& Medium
+     & 20& 6& 2& 1& 60& Medium
 \tabularnewline
-& 30& 8& 2& 2& 60& Medium
+     & 30& 8& 2& 2& 60& Medium
 \tabularnewline \hline
-3000 & 15& 4& 1& 1& 60& Low
+3000 & 10& 4& 1& 1& 60& Low
 \tabularnewline
-& 20& 6& 2& 1& 60& Low
+     & 20& 6& 2& 1& 60& Low
 \tabularnewline
-& 30& 8& 2& 2& 60& Low
+     & 30& 8& 2& 2& 60& Low
 \tabularnewline \hline 
-4000 & 15& 4& 1& 1& 60& Unnoticeable
+4000 & 10& 4& 1& 1& 60& Unnoticeable
 \tabularnewline 
-& 20& 6& 2& 1& 60& Unnoticeable
+     & 20& 6& 2& 1& 60& Unnoticeable
 \tabularnewline
-& 30& 8& 2& 2& 60& Unnoticeable
+     & 30& 8& 2& 2& 60& Unnoticeable
 \tabularnewline \hline 
 \end{tabular}
 \captionfonts
-\caption[Performance for The Grid]{Cell dimensions: 5x12x5\\Number of Cells: 26x2x42}
+\caption[Performance for The Grid]{Performance for The Grid on the GTX 480 with a scene subdivided into 26x2x42 cells.}
 \label{table:the-grid-performance-a}
 \end{center}
 \end{table}
 
-\begin{table}
-\begin{center}
-\begin{tabular}{|c|c|c|c|c|c|c|}
-\hline 
-&\multicolumn{2}{c|}{Visibility}&\multicolumn{2}{c|}{Invisibility}&&
-\tabularnewline
-Max Queries&Duration&Growth&Duration&Growth&FPS&Pop-in
-\tabularnewline
-\hline
-1000 & 15& 4& 1& 1& 60& High
-\tabularnewline
-& 20& 6& 2& 1& 60& High
-\tabularnewline
-& 30& 8& 2& 2& 60& High
-\tabularnewline \hline
-2000 & 15& 4& 1& 1& 60& Medium
-\tabularnewline
-& 20& 6& 2& 1& 60& Medium
-\tabularnewline
-& 30& 8& 2& 2& 60& Medium
-\tabularnewline \hline
-3000 & 15& 4& 1& 1& 60& Low
-\tabularnewline
-& 20& 6& 2& 1& 60& Low
-\tabularnewline
-& 30& 8& 2& 2& 60& Low
-\tabularnewline \hline 
-4000 & 15& 4& 1& 1& 60& Unnoticeable
-\tabularnewline 
-& 20& 6& 2& 1& 60& Unnoticeable
-\tabularnewline
-& 30& 8& 2& 2& 60& Unnoticeable
-\tabularnewline \hline 
-\end{tabular}
-\captionfonts
-\caption[Performance for The Grid]{The Grid map.\\Cell dimensions: 5x12x5\\Number of Cells: 26x2x42}
-\label{table:the-grid-performance-b}
-\end{center}
-\end{table}
+\subsubsection{Moving Throughout The Scene While Turning Around Quickly}
+\label{Moving Throughout The Scene While Turning Around Quickly}
 
-\begin{table}
-\begin{center}
-\begin{tabular}{|c|c|c|c|c|c|c|}
-\hline 
-&\multicolumn{2}{c|}{Visibility}&\multicolumn{2}{c|}{Invisibility}&&
-\tabularnewline
-Max Queries&Duration&Growth&Duration&Growth&FPS&Pop-in
-\tabularnewline
-\hline
-1000 & 15& 4& 1& 1& 60& High
-\tabularnewline
-& 20& 6& 2& 1& 60& High
-\tabularnewline
-& 30& 8& 2& 2& 60& High
-\tabularnewline \hline
-2000 & 15& 4& 1& 1& 60& Medium
-\tabularnewline
-& 20& 6& 2& 1& 60& Medium
-\tabularnewline
-& 30& 8& 2& 2& 60& Medium
-\tabularnewline \hline
-3000 & 15& 4& 1& 1& 60& Low
-\tabularnewline
-& 20& 6& 2& 1& 60& Low
-\tabularnewline
-& 30& 8& 2& 2& 60& Low
-\tabularnewline \hline 
-4000 & 15& 4& 1& 1& 60& Unnoticeable
-\tabularnewline 
-& 20& 6& 2& 1& 60& Unnoticeable
-\tabularnewline
-& 30& 8& 2& 2& 60& Unnoticeable
-\tabularnewline \hline 
-\end{tabular}
-\captionfonts
-\caption[Performance for The Grid]{The Grid map.\\Cell dimensions: 5x12x5\\Number of Cells: 26x2x42}
-\label{table:the-grid-performance-c}
-\end{center}
-\end{table}
+This is similar to moving throughout the scene but turning around quickly to try to induce popping artifacts.
 
-\begin{table}
-\begin{center}
-\begin{tabular}{|c|c|c|c|c|c|c|}
-\hline 
-&\multicolumn{2}{c|}{Visibility}&\multicolumn{2}{c|}{Invisibility}&&
-\tabularnewline
-Max Queries&Duration&Growth&Duration&Growth&FPS&Pop-in
-\tabularnewline
-\hline
-1000 & 15& 4& 1& 1& 60& High
-\tabularnewline
-& 20& 6& 2& 1& 60& High
-\tabularnewline
-& 30& 8& 2& 2& 60& High
-\tabularnewline \hline
-2000 & 15& 4& 1& 1& 60& Medium
-\tabularnewline
-& 20& 6& 2& 1& 60& Medium
-\tabularnewline
-& 30& 8& 2& 2& 60& Medium
-\tabularnewline \hline
-3000 & 15& 4& 1& 1& 60& Low
-\tabularnewline
-& 20& 6& 2& 1& 60& Low
-\tabularnewline
-& 30& 8& 2& 2& 60& Low
-\tabularnewline \hline 
-4000 & 15& 4& 1& 1& 60& Unnoticeable
-\tabularnewline 
-& 20& 6& 2& 1& 60& Unnoticeable
-\tabularnewline
-& 30& 8& 2& 2& 60& Unnoticeable
-\tabularnewline \hline 
-\end{tabular}
-\captionfonts
-\caption[Performance for Teapot Graveyard]{Teapot Graveyard map.\\Cell dimensions: 5x12x5\\Number of Cells: 26x2x42}
-\label{table:teapot-performance-a}
-\end{center}
-\end{table}
+\subsubsection{Looking at a Wall}
+\label{Looking at a wall}
 
-\begin{table}
-\begin{center}
-\begin{tabular}{|c|c|c|c|c|c|c|}
-\hline 
-&\multicolumn{2}{c|}{Visibility}&\multicolumn{2}{c|}{Invisibility}&&
-\tabularnewline
-Max Queries&Duration&Growth&Duration&Growth&FPS&Pop-in
-\tabularnewline
-\hline
-1000 & 15& 4& 1& 1& 60& High
-\tabularnewline
-& 20& 6& 2& 1& 60& High
-\tabularnewline
-& 30& 8& 2& 2& 60& High
-\tabularnewline \hline
-2000 & 15& 4& 1& 1& 60& Medium
-\tabularnewline
-& 20& 6& 2& 1& 60& Medium
-\tabularnewline
-& 30& 8& 2& 2& 60& Medium
-\tabularnewline \hline
-3000 & 15& 4& 1& 1& 60& Low
-\tabularnewline
-& 20& 6& 2& 1& 60& Low
-\tabularnewline
-& 30& 8& 2& 2& 60& Low
-\tabularnewline \hline 
-4000 & 15& 4& 1& 1& 60& Unnoticeable
-\tabularnewline 
-& 20& 6& 2& 1& 60& Unnoticeable
-\tabularnewline
-& 30& 8& 2& 2& 60& Unnoticeable
-\tabularnewline \hline 
-\end{tabular}
-\captionfonts
-\caption[Performance for Teapot Graveyard]{Teapot Graveyard map.\\Cell dimensions: 5x12x5\\Number of Cells: 26x2x42}
-\label{table:teapot-performance-b}
-\end{center}
-\end{table}
+Looking at a wall should keep the framerate high since objects on the side are occluded.
+This is a good time to test occlusion culling being on and off as well.
 
-\begin{table}
-\begin{center}
-\begin{tabular}{|c|c|c|c|c|c|c|}
-\hline 
-&\multicolumn{2}{c|}{Visibility}&\multicolumn{2}{c|}{Invisibility}&&
-\tabularnewline
-Max Queries&Duration&Growth&Duration&Growth&FPS&Pop-in
-\tabularnewline
-\hline
-1000 & 15& 4& 1& 1& 60& High
-\tabularnewline
-& 20& 6& 2& 1& 60& High
-\tabularnewline
-& 30& 8& 2& 2& 60& High
-\tabularnewline \hline
-2000 & 15& 4& 1& 1& 60& Medium
-\tabularnewline
-& 20& 6& 2& 1& 60& Medium
-\tabularnewline
-& 30& 8& 2& 2& 60& Medium
-\tabularnewline \hline
-3000 & 15& 4& 1& 1& 60& Low
-\tabularnewline
-& 20& 6& 2& 1& 60& Low
-\tabularnewline
-& 30& 8& 2& 2& 60& Low
-\tabularnewline \hline 
-4000 & 15& 4& 1& 1& 60& Unnoticeable
-\tabularnewline 
-& 20& 6& 2& 1& 60& Unnoticeable
-\tabularnewline
-& 30& 8& 2& 2& 60& Unnoticeable
-\tabularnewline \hline 
-\end{tabular}
-\captionfonts
-\caption[Performance for Teapot Graveyard]{Teapot Graveyard map.\\Cell dimensions: 5x12x5\\Number of Cells: 26x2x42}
-\label{table:teapot-performance-c}
-\end{center}
-\end{table}
+\subsubsection{Moving Side To Side Quickly Outside of a Hallway}
+\label{Moving Side To Side Quickly Outside of a Hallway}
+
+This is a good test to try to induce popping artifacts while moving the camera quickly.
+
+\subsection{Teapot Graveyard Test Cases}
+\label{graveyard-test-cases}
+
+\subsubsection{Moving Throughout The Scene}
+\label{graveyard-moving-throught-the-scene}
+
+This test consists of moving the camera throughout the map from the starting point to exploring the outdoor area, cave, hangar bay, and the side hallways of the hangar bay.
+This will be a good test of overall performance and whether or not popping is apparent.
+
+\subsubsection{Looking Down at The Hangar Bay From Outside}
+\label{Looking Down at The Hangar Bay From Outside}
+
+This is similar to the ``Looking at a Wall'' test for the Grid map in Section \ref{Looking at a wall}.
+In this case the camera is looking down at the ground while the hangar geometry is being occluded.
+Disabling occlusion culling while this is happening should reduce performance dramatically.
+
+\subsubsection{Suddenly Looking Down The Hangar Tunnel}
+\label{suddenly-looking-down-the-hangar-tunnel}
+
+When the camera suddenly looks down the tunnel sometimes a performance spike occurs.
+Also the floor of the hangar can sometimes pop in a bit late.
+
+\subsubsection{Moving Side to Side While Looking Through a Door}
+\label{Moving Side to Side While Looking Through a Door}
+
+Sometimes objects on the other end of the hangar pop in when moving side to side quickly while looking through the door.
+
+\subsubsection{Moving Through The Hangar Tunnel}
+\label{Moving Through The Hangar Tunnel}
+
+Performance can suffer when moving through this tunnel if the grid is too sparse since almost the entire hanager is rendered.
+
+\subsubsection{Looking at a Wall in the Hangar Side Hallways}
+\label{Looking at a Wall in the Hangar Side Hallways}
+
+This too is similar to the ``Looking at a Wall'' test for the Grid map in Section \ref{Looking at a wall}.
+The framerate tends to be higher in the side halls when the grid is less sparse, but popping artifacts increase.
 
 \section{Conclusions}
 \label{conclusions}
