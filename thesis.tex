@@ -1404,7 +1404,7 @@ Knowing when an object should be visible is part of the algorithm in the first p
 As a result, measurement of popping artifacts is measured objectively.
 The very core of this algorithm is to take advantage of the fact that people would not notice objects popping in too much, so this is the perfect way to measure the effectiveness of the algorithm.
 (TODO, in the short amount of time I have, find a group of people to test my engine and report how much they noticed objects popping in.  So far I tested on myself only)
-X people were asked to try running the engine with various settings and reported the degree of perceived noticeable pop in as either Not Noticeable, A Tiny Bit Noticeable, Sometimes Noticeable, and Very Noticeable.
+X people were asked to try running the engine with various settings and reported the degree of perceived noticeable pop in as either Not Noticeable, Barely Noticeable, Moderately Noticeable, and Very Noticeable.
 
 %\begin{figure}
 %\begin{center}
@@ -1487,49 +1487,129 @@ This will be a good test of overall performance and whether or not popping is ap
 
 \begin{table}
 \begin{center}
-GPU: GTX 480.   Cell Dimensions: 5x12x5.   Number of Cells: 26x2x42.
+GPU: GTX 480.   Cell Dimensions: 3x5x3.   Number of Cells: 44x5x70.
 \begin{tabular}{|c|c|c|c|c|c|c|}
+\hline
+&\multicolumn{2}{c|}{FPS with culling off}&\multicolumn{4}{c|}{13 to 200.  Average: 78}
+\tabularnewline
 \hline 
 &\multicolumn{2}{c|}{Visibility}&\multicolumn{2}{c|}{Invisibility}&&
 \tabularnewline
 Max Queries&Duration&Growth&Duration&Growth&FPS&Pop-in
 \tabularnewline
 \hline
-1000 & 10& 1& 1& 1& 170& Unnoticeable
+250 & 10& 1& 1& 1& 150& Unnoticeable
 \tabularnewline
-     & 20& 4& 2& 1& 191& Unnoticeable
+     & 20& 4& 2& 1& 153& Moderately Noticeable
 \tabularnewline
-     & 30& 8& 2& 2& 60& High
-\tabularnewline \hline
-2000 & 10& 4& 1& 1& 60& Medium
+     & 30& 8& 2& 2& 160& Moderately Noticeable
 \tabularnewline
-     & 20& 6& 2& 1& 60& Medium
+\hline
+500 & 10& 1& 1& 1& 150& Unnoticeable
 \tabularnewline
-     & 30& 8& 2& 2& 60& Medium
-\tabularnewline \hline
-3000 & 10& 4& 1& 1& 60& Low
+     & 20& 4& 2& 1& 150& Unnoticeable
 \tabularnewline
-     & 20& 6& 2& 1& 60& Low
+     & 30& 8& 2& 2& 167& Barely Noticeable
 \tabularnewline
-     & 30& 8& 2& 2& 60& Low
-\tabularnewline \hline 
-4000 & 10& 4& 1& 1& 60& Unnoticeable
-\tabularnewline 
-     & 20& 6& 2& 1& 60& Unnoticeable
+\hline
+1000 & 10& 1& 1& 1& 152& Unnoticeable
 \tabularnewline
-     & 30& 8& 2& 2& 60& Unnoticeable
-\tabularnewline \hline 
+     & 20& 4& 2& 1& 152& Unnoticeable
+\tabularnewline
+     & 30& 8& 2& 2& 152& Unnoticeable
+\tabularnewline
+\hline
+4000 & 10& 1& 1& 1& 152& Unnoticeable
+\tabularnewline
+     & 20& 4& 2& 1& 153& Unnoticeable
+\tabularnewline
+     & 30& 8& 2& 2& 152& Unnoticeable
+\tabularnewline
+\hline
+5000 & 10& 1& 1& 1& 170& Unnoticeable
+\tabularnewline
+     & 20& 4& 2& 1& 170& Unnoticeable
+\tabularnewline
+     & 30& 8& 2& 2& 174& Unnoticeable
+\tabularnewline
+\hline 
 \end{tabular}
 \captionfonts
-\caption[Performance for The Grid]{Performance for The Grid on the GTX 480 with a scene subdivided into 26x2x42 cells.}
+\caption[Performance for The Grid]{Performance for The Grid on the GTX 480 with a scene subdivided into 44x5x70 cells.}
 \label{table:the-grid-performance-a}
 \end{center}
 \end{table}
 
-\subsubsection{Moving Throughout The Scene While Turning Around Quickly}
-\label{Moving Throughout The Scene While Turning Around Quickly}
+\begin{table}
+\begin{center}
+GPU: GTX 480.   Cell Dimensions: 5x12x5.   Number of Cells: 26x2x42.
+\begin{tabular}{|c|c|c|c|c|c|c|}
+\hline
+&\multicolumn{2}{c|}{FPS with culling off}&\multicolumn{4}{c|}{20 to 200.  Average: 88}
+\tabularnewline
+\hline 
+&\multicolumn{2}{c|}{Visibility}&\multicolumn{2}{c|}{Invisibility}&&
+\tabularnewline
+Max Queries&Duration&Growth&Duration&Growth&FPS&Pop-in
+\tabularnewline
+\hline
+250 & 10& 1& 1& 1& 177& Unnoticeable
+\tabularnewline
+     & 20& 4& 2& 1& 177& Unnoticeable
+\tabularnewline
+     & 30& 8& 2& 2& 177& Unnoticeable
+\tabularnewline
+\hline
+500 & 10& 1& 1& 1& 177& Unnoticeable
+\tabularnewline
+     & 20& 4& 2& 1& 177& Unnoticeable
+\tabularnewline
+     & 30& 8& 2& 2& 177& Unnoticeable
+\tabularnewline
+\hline
+1000 & 10& 1& 1& 1& 170& Unnoticeable
+\tabularnewline
+     & 20& 4& 2& 1& 170& Unnoticeable
+\tabularnewline
+     & 30& 8& 2& 2& 174& Unnoticeable
+\tabularnewline
+\hline
+4000 & 10& 1& 1& 1& 170& Unnoticeable
+\tabularnewline
+     & 20& 4& 2& 1& 170& Unnoticeable
+\tabularnewline
+     & 30& 8& 2& 2& 174& Unnoticeable
+\tabularnewline 
+\hline 
+\end{tabular}
+\captionfonts
+\caption[Performance for The Grid]{Performance for The Grid on the GTX 480 with a scene subdivided into 26x2x42 cells.}
+\label{table:the-grid-performance-b}
+\end{center}
+\end{table}
 
-This is similar to moving throughout the scene but turning around quickly to try to induce popping artifacts.
+\begin{table}
+\begin{center}
+GPU: GTX 480.   Cell Dimensions: 30x30x30.   Number of Cells: 5x1x7.
+\begin{tabular}{|c|c|c|c|c|c|c|}
+\hline
+&\multicolumn{2}{c|}{FPS with culling off}&\multicolumn{4}{c|}{40 to 200.  Average: 80}
+\tabularnewline
+\hline 
+&\multicolumn{2}{c|}{Visibility}&\multicolumn{2}{c|}{Invisibility}&&
+\tabularnewline
+Max Queries&Duration&Growth&Duration&Growth&FPS&Pop-in
+\tabularnewline
+\hline
+5000 & 30& 8& 2& 2& 170& Unnoticeable
+\tabularnewline
+\hline 
+\end{tabular}
+\captionfonts
+\caption[Performance for The Grid]{Performance for The Grid on the GTX 480 with a scene subdivided into 5x1x7 cells.}
+\label{table:the-grid-performance-c}
+\end{center}
+\end{table}
 
 \subsubsection{Looking at a Wall}
 \label{Looking at a wall}
