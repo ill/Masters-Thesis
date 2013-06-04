@@ -1611,16 +1611,9 @@ Max Queries&Duration&Growth&Duration&Growth&FPS&Pop-in
 \end{center}
 \end{table}
 
-\subsubsection{Looking at a Wall}
-\label{Looking at a wall}
-
-Looking at a wall should keep the framerate high since objects on the side are occluded.
-This is a good time to test occlusion culling being on and off as well.
-
-\subsubsection{Moving Side To Side Quickly Outside of a Hallway}
-\label{Moving Side To Side Quickly Outside of a Hallway}
-
-This is a good test to try to induce popping artifacts while moving the camera quickly.
+Since the Grid map performs so well under almost any setting, the other test cases have been omitted.
+It is likely that performance or popping won't occur in the test cases any more than it did during the simple walkthrough.
+The Teapot Graveyard scene is more demanding and the bulk of various test cases are performed there.
 
 \subsection{Teapot Graveyard Test Cases}
 \label{graveyard-test-cases}
@@ -1630,6 +1623,61 @@ This is a good test to try to induce popping artifacts while moving the camera q
 
 This test consists of moving the camera throughout the map from the starting point to exploring the outdoor area, cave, hangar bay, and the side hallways of the hangar bay.
 This will be a good test of overall performance and whether or not popping is apparent.
+
+\begin{table}
+\begin{center}
+GPU: GTX 480.   Cell Dimensions: 50x50x50.   Number of Cells: 25x15x25.
+\begin{tabular}{|c|c|c|c|c|c|c|}
+\hline
+&\multicolumn{2}{c|}{FPS with culling off}&\multicolumn{4}{c|}{9 to 100.  Average: 80}
+\tabularnewline
+\hline 
+&\multicolumn{2}{c|}{Visibility}&\multicolumn{2}{c|}{Invisibility}&&
+\tabularnewline
+Max Queries&Duration&Growth&Duration&Growth&FPS&Pop-in
+\tabularnewline
+\hline
+1000 & 10& 1& 1& 1& 74& Unnoticeable
+\tabularnewline
+     & 20& 4& 2& 1& 90& Barely Noticeable
+\tabularnewline
+     & 30& 8& 2& 2& 90& Moderately Noticeable
+\tabularnewline
+\hline
+2000 & 10& 1& 1& 1& 90& Unnoticeable
+\tabularnewline
+     & 20& 4& 2& 1& 150& Unnoticeable
+\tabularnewline
+     & 30& 8& 2& 2& 167& Barely Noticeable
+\tabularnewline
+\hline
+3000 & 10& 1& 1& 1& 152& Unnoticeable
+\tabularnewline
+     & 20& 4& 2& 1& 152& Unnoticeable
+\tabularnewline
+     & 30& 8& 2& 2& 152& Unnoticeable
+\tabularnewline
+\hline
+4000 & 10& 1& 1& 1& 152& Unnoticeable
+\tabularnewline
+     & 20& 4& 2& 1& 153& Unnoticeable
+\tabularnewline
+     & 30& 8& 2& 2& 152& Unnoticeable
+\tabularnewline
+\hline
+5000 & 10& 1& 1& 1& 170& Unnoticeable
+\tabularnewline
+     & 20& 4& 2& 1& 170& Unnoticeable
+\tabularnewline
+     & 30& 8& 2& 2& 174& Unnoticeable
+\tabularnewline
+\hline 
+\end{tabular}
+\captionfonts
+\caption[Performance for Teapot Graveyard]{Performance for Teapot Graveyard on the GTX 480 with a scene subdivided into 25x15x25 cells.}
+\label{table:graveyard-a}
+\end{center}
+\end{table}
 
 \subsubsection{Looking Down at The Hangar Bay From Outside}
 \label{Looking Down at The Hangar Bay From Outside}
