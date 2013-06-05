@@ -404,7 +404,7 @@ The problem with hardware occlusion queries is their results may not be ready to
 The GPU has its own memory and processor.
 Data must travel across a bus on the motherboard between the CPU and GPU.
 Draw calls issued by the CPU are non-blocking and are stored in a buffer for the GPU to execute whenever it gets around to it.
-However, retreiving a value back from the GPU can cause a stall since the applicaiton must wait a few milliseconds for the data to travel across the bus.
+However, retreiving a value back from the GPU can cause a stall since the applicaiton must wait a few milliseconds for the GPU to execute the buffered commands and for the query result data to travel across the bus.
 The query result may be available about 3 to 4 frames later.
 When there are thousands of objects to draw, the stalls add up.
 The challenge with using hardware occlusion queries is finding a way to effectively use them in later frames to reduce CPU stalls but still save the GPU from drawing too many unnecessary objects.
