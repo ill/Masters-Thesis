@@ -1274,16 +1274,11 @@ Once the scene is traversed, the objects can now be rendered in color.
 \section{Environment}
 \label{environment}
 
-The graphics engine was tested on two machines.
 The current implementation doesn't take advantage of multithreading due to the difficulty in trying to have a good multithreaded design while experimenting with different ideas, so the number of cores isn't as much a deciding factor in performance as the speed of the processor itself.
 
-One system is a custom built desktop tower with an Intel i5-750 processor running at 2.67 Ghz and is running Windows 8 64 bit.
+The system this was tested on is a custom built desktop tower with an Intel i5-750 processor running at 2.67 Ghz and is running Windows 8 64 bit.
 It has 6 Gigabytes of RAM.
 The graphics card is an EVGA Geforce GTX 480 with Geforce 311.06 drivers installed and 1.5 Gigabytes of video memory.
-
-The other system is a Toshiba Satellite A505-S6035 laptop with an Intel i7-Q720 processor running at 1.60Ghz and is also running Windows 8 64 bit.
-It has 4 Gigabytes of RAM.
-The GPU is a Geforce GT 330M with Geforce 310.90 drivers installed and 1 Gigabyte of video memory.
 
 SDL 2.0 revision 7140 is used as the window management library.
 The glm library was used for all of the 3D math.
@@ -1298,61 +1293,22 @@ The renderer is capable of performing normal mapping, specular highlights, and r
 It's able to light the scene with point lights, spot lights, and a directional volume light for lighting up large areas.
 More features are planned for the future.
 
-\section{Test Scenes}
-\label{test-scenes}
+\section{Test Scene}
+\label{test-scene}
 
 The engine treats 1 unit as 1 meter.
-The scenes were designed keeping in mind the average height of a person being 1.7 meters or units.
-3DS Max 2012 and a custom Max Script were used for exporting the scenes into a format readable by the engine.
+The scene was designed keeping in mind the average height of a person being 1.7 meters or units.
+3DS Max 2012 and a custom Max Script were used for exporting the scene into a format readable by the engine.
 
-The first scene is an indoor scene with tight corridors called The Grid.
-Figures \ref{fig:grid-overview}, \ref{fig:grid-halls}, \ref{fig:grid-inner-sanctum}, and \ref{fig:grid-shaft} show the scene from various angles.
-The objects in this scene aren't textured due to time constraints, so they are covered in a high specular white shiny material with all the color being derived from colorful lighting.
-The scene only makes use of point lights, causing a large number of lights to be needed to light up the interior brightly.
-It's an area designed and duplicated in a grid like pattern to simulate a fairly large and sprawling indoor environment.
-This scene is approximately 130 x 12 x 210 meters in size.
-
-The second scene is a much larger area called Teapot Graveyard.
-Figures \ref{fig:graveyard-overview}, \ref{fig:teapot-graveyard}, \ref{fig:hangar-entrance}, \ref{fig:hangar}, \ref{fig:hall-corner}.
+The scene is a large outdoor area with a detailed underground indoor area.
+Figures \ref{fig:graveyard-overview}, \ref{fig:teapot-graveyard}, \ref{fig:hangar-entrance}, \ref{fig:hangar}, \ref{fig:hall-corner} show the different parts of the scene.
 The scene has also been pictured throughout the paper in Figures \ref{fig:hangar-view}, \ref{fig:hangar-peices}, \ref{fig:hangar-corner}, \ref{fig:hangar-entrance_}, \ref{fig:hangar-bay}, \ref{fig:hangar-halls}, and \ref{fig:hall-doorway}.
-It combines detailed indoor environments similar to The Grid with large outdoor areas.
-This scene makes use of all available features of the renderer.
 All objects are textured, causing extra stress to the deferred shading renderer by making it use more demanding shaders and sorting by more render states.
 The textures are borrowed from the Perfected Doom 3 mod by Vgames, who made high resolution versions of textures for id Software's game Doom 3.\cite{Perf-Doom3}
 A large number of point lights and spot lights are used for the hangar area.
 The outdoor area is a combination of several directional volume lights and randomly placed point lights.
 There is currently no heightmap terrain rendering system in place, so the terrain is composed of a set of meshes from a model that was split into 100 peices as a temporary solution.
 This scene is approximately 1250 x 750 x 1250 meters in size.
-
-\begin{figure}
-\begin{center}
-\includegraphics[width=\textwidth]{Images/Grid-Overview.jpg}
-\captionfonts
-\caption[The Grid Map Overview]{Overview of The Grid.}
-\label{fig:grid-overview}
-
-\includegraphics[width=\textwidth]{Images/GridHalls.jpg}
-\captionfonts
-\caption[Halls of the Grid]{A view of the outer hallways of The Grid.}
-\label{fig:grid-halls}
-\end{center}
-\end{figure}
-
-\begin{figure}
-\begin{center}
-\includegraphics[width=\textwidth]{Images/GridInnerSanctum.jpg}
-\captionfonts
-\caption[Grid Inner Sanctum]{A view of the inner sanctum center area.}
-\label{fig:grid-inner-sanctum}
-
-\includegraphics[width=\textwidth]{Images/GridShaft.jpg}
-\captionfonts
-\caption[Grid Shaft]{A view of the vertical shaft joining the two floors of The Grid.}
-\label{fig:grid-shaft}
-
-\end{center}
-\end{figure}
-
 
 \begin{figure}
 \begin{center}
@@ -1393,37 +1349,19 @@ This scene is approximately 1250 x 750 x 1250 meters in size.
 \end{center}
 \end{figure}
 
-\section {Metrics}
-\label{metrics}
+\section{Data}
+\label{data}
 
-The most useful metrics for this engine are the framerate and the perceived popping artifacts.
-The framerate is easily measurable and displayed with a graph that makes it easy to find causes of performance drops as the engine is running.
-The measurement of popping artifacts directly would negatively affect performance.
-A method for computing when an object or cell should be visible versus the amount of time it took for it to become visible would be difficult with the current implementation.
-Knowing when an object should be visible is part of the algorithm in the first place, and the query cap causes a slight delay in visibility time of objects farther away.
-As a result, measurement of popping artifacts is measured objectively.
-The very core of this algorithm is to take advantage of the fact that people would not notice objects popping in too much, so this is the perfect way to measure the effectiveness of the algorithm.
-(TODO, in the short amount of time I have, find a group of people to test my engine and report how much they noticed objects popping in.  So far I tested on myself only)
-X people were asked to try running the engine with various settings and reported the degree of perceived noticeable pop in as either Not Noticeable, Barely Noticeable, Moderately Noticeable, and Very Noticeable.
+\subsection{Framerate}
+\label{framerate}
 
-%\begin{figure}
-%\begin{center}
-%\includegraphics[width=\textwidth]{Images/PerfGraph.jpg}
-%\captionfonts
-%\caption[Performance Graph]{A graph showing performance statistics on the fly.}
-%\label{fig:performance-graph}
-%\end{center}
-%\end{figure}
+The scene was tested with various grid dimensions and with two different query caps.
+The aim is to find the best overall framerate, while keeping it above 30 FPS at all times.
+The framerate changes depending on where the camera is looking in the scene.
+It is better to have one area running at 40 FPS and another running at 35 FPS than to have one area running at 100 FPS and another running at 10 FPS.
+A framerate of 100 FPS is not much more noticeable than 40, while a framerate of 10 would provide a poor experience.
 
-\subsection {Variables}
-\label{variables}
-
-\subsubsection{Occlusion Culling}
-\label{vars-occlusion-culling}
-Performance should increase with occlusion culling enabled.
-The frame rate is measured by viewing the scene with view frustum culling only and no occlusion culling to see if an increase in framerate occurs when occlusion culling is enabled.
-
-\subsubsection{Grid Dimensions}
+\subsection{Grid Dimensions}
 \label{grid-dimensions}
 The grid dimensions affect how well parts of the scene are occluded.
 The more a scene is subdivided, the less objects there are in the cells.
@@ -1433,291 +1371,80 @@ More cells also means more queries need to be executed for the same draw distanc
 In this way more subdivision can also negatively affect performance due to the number of queries being executed.
 This can also cause more noticeable popping since the query cap can be hit, requiring a longer time until some objects become visible.
 
-\subsubsection{Maximum Queries Per Frame}
+\subsection{Maximum Queries Per Frame}
 \label{maximum-queries-per-frame}
 The query cap is meant to improve performance for high density grids by spreading the queries out over multiple frames.
 Lower numbers improve performance, but cause more noticeable popping than higher numbers.
 
-\subsubsection{Visibility Query Duration}
-\label{visibility-query-duration}
-This determines how long the results of a cell being marked as visible last.
-It is safe to assume that a cell marked as visible will stay visible for some time afterwards, and requerying this cell needlessly should be avoided.
-Higher numbers reduce the likelyhood that the query cap will be hit as often by reducing the number of queries that need to be run.
-Higher numbers can also potentially induce spikes of lower framerate since cells that are now invisible are still considered visible for a few frames and unnecessary objects are being rendered.
+\subsection{The Testing Method}
+\label{the-testing-method}
+To test the engine, a flythrough is recorded storing camera positions and orientations at different times.
+The engine plays this flythrough back, ensuring the same areas are revisited at every test during the experiment.
+Various statistics are recorded each frame and logged so they can be displayed in graph form in Figures \ref{fig:graph-3000} and \ref{fig:graph-4000}.
+(TODO: fix the figure references.  This is supposed to point to figures 5.6 and 5.7)
 
-\subsubsection{Invisibility Query Duration}
-\label{invisibility-query-duration}
-This determines how long the results of a cell being marked as not visible last.
-This is kept separate from visibility query duration because non-visible cells should be checked more often in a scene full of motion.
-Visibility query duration can safely be kept high up in the thirties, but invisibility duration should be kept at about one to two frames.
-Higher numbers reduce the likelyhood that the query cap will be hit.
-Higher numbers for this also increase the popping artifacts when the camera or objects in the scene are moving due to constantly changing visibility.
+The graph shows the performance metrics at different points in time during the flythrough.
+Portions of the graph are labeled to describe the general area the camera was at that moment.
 
-\subsubsection{Visibility Query Duration Growth}
-\label{visibility-query-duration-growth}
-The algorithm measures how many frames in a row the query cap has been hit.
-To avoid query starvation, query results get longer durations depending on the number of frames in a row the cap has been hit.
-Lower numbers make query starvation more likely to happen.
-Higher numbers can induce spikes of lower framerate by increasing the length of a visibility query.
+\subsubsection{Outside Area}
+This is the large outside area that makes up the majority of the map.
+Most of the scene is visible out here, causing a large portion of the scene to be drawn.
+However, the outdoor area is also not as detailed as the underground hangar.
 
-\subsubsection{Invisibility Query Duration Growth}
-\label{invisibility-query-duration-growth}
-This too is kept separate from visibility query duration growth so non-visible cells get checked more often.
-This number should be much lower than visibility query duration growth for the same reasons.
-When the base invisibility query duration is a low number like one frame, this variable increases it by a little bit to reduce query starvation.
-Lower numbers make query starvation more likely to happen.
-Higher numbers increase visibility popping artifacts during motion.
+\subsubsection{Cave}
+There is a tiny underground cave to simulate a tight indoor environment.
+Very few objects get rendered when the camera is located here since so little of the world is visible.
 
-\section {Test Cases}
-\label{test-cases}
+\subsubsection{Hangar Tunnel}
+This is the portion of the map that joins the outdoor area and the indoor portion of the hangar.
+This is often an area that causes poor performance under sparses grids.
+With tighter grids, only a small portion of the hangar gets drawn when looking down the tunnel.
+When the grid is sparse, the entire hangar gets drawn, causing a very low framerate.
 
-The data is collected by measuring the framerate and noticeable popping in various test cases.
-Some tests consist of measuring only the framerate if popping is not applicable to the test.
-The tests involve moving through the scenes in various areas and looking at certain points of interest.
-Some test cases consist of moving the camera in ways that should induce popping artifacts, such as turning around quickly, or moving side to side around doorways.
+\subsubsection{Hangar}
+This is a large open indoor area with many objects and lights to provide high detail.
+This is an area of the map that often causes the most stress due to the large amount of objects to render.
 
-\subsection{The Grid Test Cases}
-\label{the-grid-test-cases}
+\subsubsection{Halls}
+These are halls that border outside of the hangar itself.
+With sparser grids, more of the hanger gets rendered even when just looking right at a wall.
+Tighter grids typically provide the best performance in this area since more objects get occluded.
 
-\subsubsection{Moving Throughout The Scene}
-\label{grid-moving-throught-the-scene}
+\subsubsection{Door Test}
+In this portion of the flythrough, the camera is positioned in the hallway looking through a doorway out into the hangar.
+The camera then moves side to side so that it looks at the wall around the doorway for a bit.
+This is a good test of how noticeable popping artifacts are since objects may pop in when the camera suddenly can see into the hangar when it was previously looking at a wall.
 
-This test consists of moving the camera throughout the map from the starting point and going through all of the various hallways.
-This will be a good test of overall performance and whether or not popping is apparent.
-
-\begin{table}
+\begin{figure}
 \begin{center}
-GPU: GTX 480.   Cell Dimensions: 3x5x3.   Number of Cells: 44x5x70.
-\begin{tabular}{|c|c|c|c|c|c|c|}
-\hline
-&\multicolumn{2}{c|}{FPS with culling off}&\multicolumn{4}{c|}{13 to 200.  Average: 78}
-\tabularnewline
-\hline 
-&\multicolumn{2}{c|}{Visibility}&\multicolumn{2}{c|}{Invisibility}&&
-\tabularnewline
-Max Queries&Duration&Growth&Duration&Growth&FPS&Pop-in
-\tabularnewline
-\hline
-250 & 10& 1& 1& 1& 150& Unnoticeable
-\tabularnewline
-     & 20& 4& 2& 1& 153& Moderately Noticeable
-\tabularnewline
-     & 30& 8& 2& 2& 160& Moderately Noticeable
-\tabularnewline
-\hline
-500 & 10& 1& 1& 1& 150& Unnoticeable
-\tabularnewline
-     & 20& 4& 2& 1& 150& Unnoticeable
-\tabularnewline
-     & 30& 8& 2& 2& 167& Barely Noticeable
-\tabularnewline
-\hline
-1000 & 10& 1& 1& 1& 152& Unnoticeable
-\tabularnewline
-     & 20& 4& 2& 1& 152& Unnoticeable
-\tabularnewline
-     & 30& 8& 2& 2& 152& Unnoticeable
-\tabularnewline
-\hline
-4000 & 10& 1& 1& 1& 152& Unnoticeable
-\tabularnewline
-     & 20& 4& 2& 1& 153& Unnoticeable
-\tabularnewline
-     & 30& 8& 2& 2& 152& Unnoticeable
-\tabularnewline
-\hline
-5000 & 10& 1& 1& 1& 170& Unnoticeable
-\tabularnewline
-     & 20& 4& 2& 1& 170& Unnoticeable
-\tabularnewline
-     & 30& 8& 2& 2& 174& Unnoticeable
-\tabularnewline
-\hline 
-\end{tabular}
+\includegraphics[width=\textwidth]{Images/Graphs/480-3000.pdf}
+\label{fig:graph-3000}
 \captionfonts
-\caption[Performance for The Grid]{Performance for The Grid on the GTX 480 with a scene subdivided into 44x5x70 cells.}
-\label{table:the-grid-performance-a}
+\caption[Query Cap of 3000]{Data for a scene with a query cap of 3000.  TODO: make the caption not be messed up like this.}
 \end{center}
-\end{table}
+\end{figure}
 
-\begin{table}
+\begin{figure}
 \begin{center}
-GPU: GTX 480.   Cell Dimensions: 5x12x5.   Number of Cells: 26x2x42.
-\begin{tabular}{|c|c|c|c|c|c|c|}
-\hline
-&\multicolumn{2}{c|}{FPS with culling off}&\multicolumn{4}{c|}{20 to 200.  Average: 88}
-\tabularnewline
-\hline 
-&\multicolumn{2}{c|}{Visibility}&\multicolumn{2}{c|}{Invisibility}&&
-\tabularnewline
-Max Queries&Duration&Growth&Duration&Growth&FPS&Pop-in
-\tabularnewline
-\hline
-250 & 10& 1& 1& 1& 177& Unnoticeable
-\tabularnewline
-     & 20& 4& 2& 1& 177& Unnoticeable
-\tabularnewline
-     & 30& 8& 2& 2& 177& Unnoticeable
-\tabularnewline
-\hline
-500 & 10& 1& 1& 1& 177& Unnoticeable
-\tabularnewline
-     & 20& 4& 2& 1& 177& Unnoticeable
-\tabularnewline
-     & 30& 8& 2& 2& 177& Unnoticeable
-\tabularnewline
-\hline
-1000 & 10& 1& 1& 1& 170& Unnoticeable
-\tabularnewline
-     & 20& 4& 2& 1& 170& Unnoticeable
-\tabularnewline
-     & 30& 8& 2& 2& 174& Unnoticeable
-\tabularnewline
-\hline
-4000 & 10& 1& 1& 1& 170& Unnoticeable
-\tabularnewline
-     & 20& 4& 2& 1& 170& Unnoticeable
-\tabularnewline
-     & 30& 8& 2& 2& 174& Unnoticeable
-\tabularnewline 
-\hline 
-\end{tabular}
+\includegraphics[width=\textwidth]{Images/Graphs/480-50x30x50-2000-10-1-1-1.pdf}
+\label{fig:graph-4000}
 \captionfonts
-\caption[Performance for The Grid]{Performance for The Grid on the GTX 480 with a scene subdivided into 26x2x42 cells.}
-\label{table:the-grid-performance-b}
+\caption[Query Cap of 4000]{Data for a scene with a query cap of 4000.  TODO: make the caption not be messed up like this.}
 \end{center}
-\end{table}
-
-\begin{table}
-\begin{center}
-GPU: GTX 480.   Cell Dimensions: 30x30x30.   Number of Cells: 5x1x7.
-\begin{tabular}{|c|c|c|c|c|c|c|}
-\hline
-&\multicolumn{2}{c|}{FPS with culling off}&\multicolumn{4}{c|}{40 to 200.  Average: 80}
-\tabularnewline
-\hline 
-&\multicolumn{2}{c|}{Visibility}&\multicolumn{2}{c|}{Invisibility}&&
-\tabularnewline
-Max Queries&Duration&Growth&Duration&Growth&FPS&Pop-in
-\tabularnewline
-\hline
-5000 & 30& 8& 2& 2& 170& Unnoticeable
-\tabularnewline
-\hline 
-\end{tabular}
-\captionfonts
-\caption[Performance for The Grid]{Performance for The Grid on the GTX 480 with a scene subdivided into 5x1x7 cells.}
-\label{table:the-grid-performance-c}
-\end{center}
-\end{table}
-
-Since the Grid map performs so well under almost any setting, the other test cases have been omitted.
-It is likely that performance or popping won't occur in the test cases any more than it did during the simple walkthrough.
-The Teapot Graveyard scene is more demanding and the bulk of various test cases are performed there.
-
-\subsection{Teapot Graveyard Test Cases}
-\label{graveyard-test-cases}
-
-\subsubsection{Moving Throughout The Scene}
-\label{graveyard-moving-throught-the-scene}
-
-This test consists of moving the camera throughout the map from the starting point to exploring the outdoor area, cave, hangar bay, and the side hallways of the hangar bay.
-This will be a good test of overall performance and whether or not popping is apparent.
-
-\begin{table}
-\begin{center}
-GPU: GTX 480.   Cell Dimensions: 50x50x50.   Number of Cells: 25x15x25.
-\begin{tabular}{|c|c|c|c|c|c|c|}
-\hline
-&\multicolumn{2}{c|}{FPS with culling off}&\multicolumn{4}{c|}{9 to 100.  Average: 80}
-\tabularnewline
-\hline 
-&\multicolumn{2}{c|}{Visibility}&\multicolumn{2}{c|}{Invisibility}&&
-\tabularnewline
-Max Queries&Duration&Growth&Duration&Growth&FPS&Pop-in
-\tabularnewline
-\hline
-1000 & 10& 1& 1& 1& 74& Unnoticeable
-\tabularnewline
-     & 20& 4& 2& 1& 90& Barely Noticeable
-\tabularnewline
-     & 30& 8& 2& 2& 90& Moderately Noticeable
-\tabularnewline
-\hline
-2000 & 10& 1& 1& 1& 90& Unnoticeable
-\tabularnewline
-     & 20& 4& 2& 1& 150& Unnoticeable
-\tabularnewline
-     & 30& 8& 2& 2& 167& Barely Noticeable
-\tabularnewline
-\hline
-3000 & 10& 1& 1& 1& 152& Unnoticeable
-\tabularnewline
-     & 20& 4& 2& 1& 152& Unnoticeable
-\tabularnewline
-     & 30& 8& 2& 2& 152& Unnoticeable
-\tabularnewline
-\hline
-4000 & 10& 1& 1& 1& 152& Unnoticeable
-\tabularnewline
-     & 20& 4& 2& 1& 153& Unnoticeable
-\tabularnewline
-     & 30& 8& 2& 2& 152& Unnoticeable
-\tabularnewline
-\hline
-5000 & 10& 1& 1& 1& 170& Unnoticeable
-\tabularnewline
-     & 20& 4& 2& 1& 170& Unnoticeable
-\tabularnewline
-     & 30& 8& 2& 2& 174& Unnoticeable
-\tabularnewline
-\hline 
-\end{tabular}
-\captionfonts
-\caption[Performance for Teapot Graveyard]{Performance for Teapot Graveyard on the GTX 480 with a scene subdivided into 25x15x25 cells.}
-\label{table:graveyard-a}
-\end{center}
-\end{table}
-
-\subsubsection{Looking Down at The Hangar Bay From Outside}
-\label{Looking Down at The Hangar Bay From Outside}
-
-This is similar to the ``Looking at a Wall'' test for the Grid map in Section \ref{Looking at a wall}.
-In this case the camera is looking down at the ground while the hangar geometry is being occluded.
-Disabling occlusion culling while this is happening should reduce performance dramatically.
-
-\subsubsection{Suddenly Looking Down The Hangar Tunnel}
-\label{suddenly-looking-down-the-hangar-tunnel}
-
-When the camera suddenly looks down the tunnel sometimes a performance spike occurs.
-Also the floor of the hangar can sometimes pop in a bit late.
-
-\subsubsection{Moving Side to Side While Looking Through a Door}
-\label{Moving Side to Side While Looking Through a Door}
-
-Sometimes objects on the other end of the hangar pop in when moving side to side quickly while looking through the door.
-
-\subsubsection{Moving Through The Hangar Tunnel}
-\label{Moving Through The Hangar Tunnel}
-
-Performance can suffer when moving through this tunnel if the grid is too sparse since almost the entire hanager is rendered.
-
-\subsubsection{Looking at a Wall in the Hangar Side Hallways}
-\label{Looking at a Wall in the Hangar Side Hallways}
-
-This too is similar to the ``Looking at a Wall'' test for the Grid map in Section \ref{Looking at a wall}.
-The framerate tends to be higher in the side halls when the grid is less sparse, but popping artifacts increase.
+\end{figure}
 
 \section{Conclusions}
 \label{conclusions}
-These results show that a maximum of about 3000 to 4000 queries gives the best balance between performance and perceived object pop in.
-The large outdoor Teapot Graveyard map benefits from a denser grid when exploring the underground hangar area.
-This section contains tight indoor corridors, and having a denser grid allows the engine to avoid rendering more objects behind walls.
-The outdoor portion doesn't show benefit from a denser grid, so maps that are exclusively outdoors should stick to using sparser grids.
+These results show that there is a relationship between the framerate and the number of objects rendered.
+It is hard to see a difference in performance between a query cap of 3000 and 4000 from the graphs, but visually, there are a few areas that produce popping artifacts more noticeably with a query cap of 3000.
+The scene was also tried with a query cap of 2000 but the popping artifacts were too noticeable leading to unacceptable compromises in visual quality.
 
-The indoor map, The Grid, doesn't hit the query maximum as much.
-Even with a more dense grid than Teapot Graveyard, there are less grid cells to rasterize since the map dimensions are smaller.
-This map tends to keep up a high framerate at all times, showing how well this algorithm performs in the kinds of environments that are usually rendered with portal culling and other static indoor environment techniques.
+When occlusion culling is turned off, the framerate can fluctuate between high values and back down to values around 30 and at times go even lower.
+The framerate can be seen to dip when the number of rendered nodes jumps up to high values.
+
+The different grid sizes can be seen to produce different performance depending on if the camera is looking at outdoor portions of the scene or at indoor portions.
+The sparser grid performs better outside, while the tighter grid performs better inside.
+The grid size in between seems to produce a more even framerate which is typically desireable.
 
 These tests have shown that the visibility culling algorithm presented in this paper is effective for both indoor and outdoor environments.
 Although hardware occlusion queries can cause CPU stalls, using them wisely can be very beneficial.
