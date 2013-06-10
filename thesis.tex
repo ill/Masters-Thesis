@@ -696,9 +696,9 @@ Modifying the algorithm to avoid this, especially extended to 3D, was too messy.
 The final idea involves taking axis aligned slices of the grid perpendicular to the highest magnitude component of the view vector.
 It is a simple algorithm compared to the previously tried solutions and can be based on existing convex polygon rasterization algorithms but extended to 3D.
 This is not a true front to back traversal but it provides the needed results.
-In Figure \ref{fig:frustum-iter}, cell 8 is traversed after cell 7, but cell 8 is closer in distance.
-However, cell 7 will never occupy space in front of cell 8, so any objects in cell 7 will never be drawn in front of cell 8.
-Cell 8 will be occluded by objects in cell 3 and 0, while cell 7 will most likely by occluded by objects in cells 6, 5, 2, 1, and 0.
+In Figure \ref{fig:frustum-iter}, cell 6 is traversed after cell 5, but cell 6 is closer in distance.
+However, cell 6 will never occupy space in front of cell 5, so any objects in cell 6 will never be drawn in front of cell 5.
+Cell 6 will be occluded by objects in cells 2 and 0, while cell 5 will most likely by occluded by objects in cells 0, 1, and 4.
 As long as a cell is traversed after the cells that could potentially occlude it, the query results will be optimal and not create false positives.
 This gives a true occlusion order traversal but not a true depth order traversal.
 This same traversal order is also perfect for roughly depth sorting alpha blended objects that will need to be rendered later.
