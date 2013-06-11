@@ -720,12 +720,12 @@ This depth sorting can even be parallelized by using a separate thread per cell,
 In practice, view frustums are very wide.
 A camera using a standard 90 degree vertical field of view on a 16:9 wide screen monitor will create a horizontal field of about 160 degrees.
 Wide frustums cause cells that should have been occluded to be traversed before the cells that occlude them as shown in Figure \ref{fig:wide-frustum-iter}.
-In this case cell 0 is most likely occluded by cells 3, 4, and 5.
-Even if the camera is staring straight at a wall, cells 0, 1, and 2 will falsely pass the occlusion queries because the wall in cell 3 hasn't been rendered to the z buffer yet.
+In this case cell 0 is most likely occluded by cells 32, 21, 22, 23, 24, 12, 13, 14, 15, and so on.
+Even if the camera is staring straight at a wall, cells 21, 22, 23, and the others will falsely pass the occlusion queries because the wall in cell 32 hasn't been rendered to the z buffer yet.
 
 \begin{figure}
 \begin{center}
-\includegraphics[width=0.75\textwidth]{Images/wide-frustum.pdf}
+\includegraphics[width=0.75\textwidth]{Images/wide-frustum.png}
 \captionfonts
 \caption[Incorrect Wide View Frustum Traversal]{Incorrect traversal of angled wide view frustum.}
 \label{fig:wide-frustum-iter}
@@ -738,12 +738,12 @@ This creates new convex volumes out of the split view frustum.
 In 3D, the frustum is split into 8 pieces by the x, y, and z planes.
 A convex polygon plane clipping algorithm will do the trick.
 The volumes are now traversed in a fan out order around the center cell.
-In Figure \ref{fig:correct-wide-frustum-iter}, first the central volume is traversed, and then cells 22, 23, and 24 are traversed afterwards.
+In Figure \ref{fig:correct-wide-frustum-iter}, first the central volume is traversed, and then cells 60 and onward are traversed afterwards.
 This keeps the correct occluder order prevents cells from being falseley determined to be visible.
 
 \begin{figure}
 \begin{center}
-\includegraphics[width=0.75\textwidth]{Images/wide-traversal.pdf}
+\includegraphics[width=0.75\textwidth]{Images/wide-traversal.png}
 \captionfonts
 \caption[Correct Wide View Frustum]{Correct traversal of split angled wide view frustum.}
 \label{fig:correct-wide-frustum-iter}
