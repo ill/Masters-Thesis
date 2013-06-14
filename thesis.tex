@@ -1473,6 +1473,161 @@ The CPU stall from gathering query results from last frame mentioned earlier wou
 The query results would likely be ready by the time the engine is done updating the rest of the game.
 There may also be room for parallelizing some portions of this algorithm, such as the sorting of alpha blended objects mentioned earlier.
 
+\appendix
+
+\chapter{The 3D Rasterizing Algorithm}
+\label{rasterizing-algorithm}
+
+Here we go over the 3D rasterizing algorithm used for scene traversal in greater detail.
+This algorithm works on any convex 3D mesh.
+The view frustum happens to be a convex 3D mesh, but is usually split into peices to create smaller convex meshes. 
+
+\subsection{Mesh Edge List}
+\label{mesh-edge-list}
+
+First a mesh edge list is needed.
+When dealing with view frustums, the eight points that make up the shape are needed.
+The frustum consists of six planes.
+Each point is derived from finding the intersection point between the three corresponding planes adjacent to that point.
+Once the points are found, a list of edges that joins those points gets built with an example shown in Figure \ref{fig:point-edge-list}.
+This mesh edge list is now the stored representation of the convex 3D mesh that will be rasterized.
+
+\begin{figure}
+\begin{center}
+\includegraphics[width=0.5\textwidth]{Images/RasterizingAlgorithm/Final/Frust.png}
+\captionfonts
+\caption[Point Edge List]{A view frustum converted to a point edge list.}
+\label{fig:point-edge-list}
+\end{center}
+\end{figure}
+
+\subsection{Clipping Algorithm}
+\label{clipping-algorithm}
+
+The mesh edge list needs to be clippable by a plane to remove portions of the mesh or to split it into pieces.
+After the view frustum is turned into a mesh edge list, it needs to be clipped against the bounds of the 3D uniform grid to avoid traversing cells outside of the scene bounds.
+Section \ref{handling-wide-fields-of-view} also relies on this clipping algorithm when splitting the frustum into pieces.
+
+This is done by first finding which side of the splitting plane all of the points are on.
+The points and all other geometry behind the splitting plane get discarded.
+To split the mesh without discarding what is on the back side, the algorithm is performed twice on the original mesh with two oppositely facing planes.
+
+Now there is a list of which points are on the back side of the plane.
+For the corresponding edges whose other point is on the front side of the plane, the edge is clipped by the plane.
+This creates a new point for the edge, and the old point is discarded.
+If both points of an edge are on the back side of a plane, the entire edge is discarded.
+
+This now leaves a partly complete convex mesh edge list.
+New edges need to be computed between the newly created points to close the shape and form the new face.
+This is done by performing a 2D convex hull algorithm projected onto the clipping plane.
+The monotone chain convex hull algorithm finds edges between the new points.\cite{monotone-chain}
+
+\subsection{World to Algorithm Space}
+\label{world-to-algorithm-space}
+
+The view frustum needs to be traversed in an order relative to the view.
+However it is easier to write the rasterizing algorithm to not know about this traversal order.
+The slices are always assumed to go down the z axis.
+The slices are then rasterized left to right along the x axis and bottom to top along the y axis.
+
+This means that the points of the mesh edge list need to be converted to a different coordinate space.
+For example, if the camera is looking down the x axis in the world, the frustum is sliced down the x axis as well.
+Since in algorithm space, the slices go down the z axis, the x coordinates and the z coordinates of the points in the mesh edge list get swapped.
+
+As the convex mesh is rasterized in algorithm space, the grid cells are computed in algorithm space as well.
+The grid cells then need to be converted back to world space to map to the grid cells in the world that are being traversed by the algorithm.
+
+\subsection{Slicing The Mesh Edge List}
+\label{slicing-mesh-edge-list}
+
+The 3D mesh edge list now has slices of it taken and then projected into 2D to later be rasterized with a 2D polygon rasterizing algorithm.
+This is done in increments based on the grid size as shown in Figure \ref{fig:edge-list-slice}.
+
+\begin{figure}
+\begin{center}
+\includegraphics[width=0.5\textwidth]{Images/RasterizingAlgorithm/Final/FrustSlice.png}
+\captionfonts
+\caption[Mesh Edge List Slice]{A mesh edge list slice with the dimensions of the grid.}
+\label{fig:edge-list-slice}
+\end{center}
+\end{figure}
+
+The mesh edges that intersect with the grid edges get clipped to leave behind sets of points.
+These points are projected into 2D and then the monotone chain algorithm is used again to create a 2D convex mesh as shown in Figure \ref{fig:projected-slice}.
+
+\begin{figure}
+\begin{center}
+\includegraphics[width=0.5\textwidth]{Images/RasterizingAlgorithm/Final/SliceOrtho.png}
+\captionfonts
+\caption[Mesh Edge List Slice 2D View]{The slice and its points projected to 2D.  The yellow lines show the convex polygon that will be rasterized after performing the monotone chain convex hull algorithm on the projected points.}
+\label{fig:projected-slice}
+\end{center}
+\end{figure}
+
+A double buffer of point lists is kept.
+The intersection points from the front side of the last slice are kept to now be used as the back side of the current slice.
+This avoids unnecessary recomputation of the intersection points against edges of the mesh if those points were already computed last slice.
+
+First the active edges to be clipped are found to avoid checking all edges every slice.
+This is done initially by finding all points within the first slice being rasterized.
+Those points get added to the point buffer.
+
+The corresponding edges from those points now become the active edges that will be clipped.
+For each newly found edge, the number of slices until the edge's other point gets computed.
+A counter is stored for each active edge, and is counted down at each slice.
+Once the counter runs out, the corresponding edges for that other point become the new active edges.
+That other point also gets added to the point buffer for the current slice in order to potentially contribute to the shape of the 2D rasterized polygon built from the slice.
+
+\subsection{Rasterizing The Slices}
+\label{rasterizing-the-slices}
+
+At this point it can be possible to use standard 2D polygon rasterizing algorithms, but a few edge cells may sometimes be missed.
+To ensure all cells are traversed that intersect with the edges, a slightly modified 2D rasterizing algorithm is used.
+The 2D convex polygon found in Section \ref{slicing-mesh-edge-list} is scan converted row by row in the grid as shown in Figure \ref{fig:rasterized-row}.
+The range of cells to be rasterized for each row needs to be found.
+
+\begin{figure}
+\begin{center}
+\includegraphics[width=0.5\textwidth]{Images/RasterizingAlgorithm/Final/FrustSliceNRowOrthoLabeled.png}
+\captionfonts
+\caption[Mesh Edge List Row]{A row of the slice being rasterized.}
+\label{fig:rasterized-row}
+\end{center}
+\end{figure}
+
+The monotone chain algorithm used in the previous step in Section \ref{slicing-mesh-edge-list} gives two point lists.
+The lists are in an order that represents a chain of edges.
+One is the left side of the polygon, and the other is the right side.
+The left side and right side are traversed independently.
+
+The active edge for each side is found by starting at the beginning of the list.
+Next, the number of rows is found until the next point in the point list.
+Again, a countdown is formed until the end of the current active edge based on the number of rows until the next point.
+Now, if an edge is facing outward, it is clipped against the top of the row and if facing inward it is clipped against the bottom.
+The range of cells to rasterize for the row is derived from these points as shown in Figure \ref{fig:finding-row-range} by computing which grid cell the point is in.
+
+\begin{figure}
+\begin{center}
+\includegraphics[width=0.5\textwidth]{Images/RasterizingAlgorithm/Final/RasterizingInOut.png}
+\captionfonts
+\caption[Finding The Row Range]{The two sides of the polygon are being clipped against the row bottom and top.  Here the left red side is facing inward, while the right blue side is facing outward.  The active edges are boldened.}
+\label{fig:finding-row-range}
+\end{center}
+\end{figure}
+
+As the point list is being traversed, the edge may switch from facing outward to facing inward.
+Due to being a convex polygon, the edge will never face outward again.
+The point between an outward facing edge and an inward facing edge as shown in Figure \ref{fig:finding-row-range-switch} is now used to determine the row range by computing which grid cell the point is in.
+
+\begin{figure}
+\begin{center}
+\includegraphics[width=0.5\textwidth]{Images/RasterizingAlgorithm/Final/RasterizingOuterInnerSwitch.png}
+\captionfonts
+\caption[Finding The Row Range In Orientation Switch]{Now the point between two active edges is used to determine the row range when the edge orientation changes.}
+\label{fig:finding-row-range-switch}
+\end{center}
+\end{figure}
+
 % ------------- End main chapters ----------------------
 
 \clearpage
