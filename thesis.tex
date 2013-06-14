@@ -180,11 +180,11 @@ It is possible to have non-photo realistic graphics as well like the character f
 \begin{center}
 \includegraphics[width=\textwidth]{Images/BF3.jpg}
 \captionfonts
-\caption[Battlefield 3]{The photorealistic real-time graphics of Battlefield 3. (TODO: make these images side by side and figure out how to cite them)}
+\caption[Battlefield 3]{The photorealistic real-time graphics of Battlefield 3.\cite{bf3}}
 \label{fig:bf3}
 \includegraphics[width=\textwidth]{Images/Borderlands_2.png}
 \captionfonts
-\caption[Borderlands 2]{The comic book style of Borderlands 2.}
+\caption[Borderlands 2]{The comic book style of Borderlands 2.\cite{border2}}
 \label{fig:borderlands2}
 \end{center}
 \end{figure}
@@ -210,8 +210,7 @@ These kinds of environments are achievable by avoiding drawing as much of the wo
 This is the job of a visibility culling algorithm.
 The scene is viewed through a virtual camera.
 Objects visible to the camera fit within the frustum as shown in Figure \ref{fig:frustum}.
-It is relatively easy to avoid drawing portions of the scene that are not in the camera's field of view with view frustum culling by checking if the object is inside this frustum.
-(TODO: cite: http://www.lighthouse3d.com/tutorials/view-frustum-culling/)
+It is relatively easy to avoid drawing portions of the scene that are not in the camera's field of view with view frustum culling by checking if the object is inside this frustum.\cite{vfc}
 If a camera is looking at a wall or a mountain in the distance, it is also best to avoid drawing the objects behind them.
 Figuring out that objects are behind other objects in real-time is a challenge but can save many unnecessary draw calls to the GPU.
 
@@ -219,7 +218,7 @@ Figuring out that objects are behind other objects in real-time is a challenge b
 \begin{center}
 \includegraphics[width=0.5\textwidth]{Images/frustum.png}
 \captionfonts
-\caption[View Frustum]{A camera and its view frustum. A frustum is a pyramid with its top cut off. Objects within the frustum are visible.(TODO cite:http://www.pcmag.com/encyclopedia/term/61771/viewing-frustum)}
+\caption[View Frustum]{A camera and its view frustum. A frustum is a pyramid with its top cut off. Objects within the frustum are visible.\cite{vfc-image}}
 \label{fig:frustum}
 \end{center}
 \end{figure}
@@ -530,7 +529,7 @@ Objects such as tanks or soldiers have their bounding rectangle tested against t
 \begin{center}
 \includegraphics[width=0.75\textwidth]{Images/Bf3Buffer.jpg}
 \captionfonts
-\caption[Software Z Buffer Buffer]{The low resolution software z-buffer from a scene in Battlefield 3. (TODO: cite Culling the battlefield pres)}
+\caption[Software Z Buffer Buffer]{The low resolution software z-buffer from a scene in Battlefield 3.\cite{culling-bf}}
 \label{fig:softare-z}
 \end{center}
 \end{figure}
@@ -546,7 +545,7 @@ CryENGINE also allows for use of portals and occlusion geometry that they refer 
 \begin{center}
 \includegraphics[width=0.5\textwidth]{Images/CryCoverage.jpg}
 \captionfonts
-\caption[Cry Engine Coverage Buffer]{The coverage buffer used in CryENGINE 3.  The red portions are the holes after reprojecting from previous frames to the current camera angle. (TODO: cite Secrets of Cryengine 3 Pres)}
+\caption[Cry Engine Coverage Buffer]{The coverage buffer used in CryENGINE 3.  The red portions are the holes after reprojecting from previous frames to the current camera angle.\cite{cryengine3}}
 \label{fig:cry-coverage}
 \end{center}
 \end{figure}
@@ -1382,9 +1381,8 @@ Lower numbers improve performance, but cause more noticeable popping than higher
 \label{the-testing-method}
 To test the engine, a flythrough is recorded storing camera positions and orientations at different times.
 The engine plays this flythrough back, ensuring the same areas are revisited at every test during the experiment.
-Various statistics are recorded each frame and logged so they can be displayed in graph form in Figures \ref{fig:graph-3000} and \ref{fig:graph-4000}.
-Figure \ref{fig:average-relative} shows the framerate relative to the average of the entire run.
-(TODO: fix the figure references.  This is supposed to point to figures 5.6 and 5.7)
+Various statistics are recorded each frame and logged so they can be displayed in graph form in Figures ~\ref{fig:graph-3000} and ~\ref{fig:graph-4000}.
+Figure ~\ref{fig:average-relative} shows the framerate relative to the average of the entire run.
 
 The graph shows the performance metrics at different points in time during the flythrough.
 Portions of the graph are labeled to describe the general area the camera was at that moment.
@@ -1423,7 +1421,7 @@ This is a good test of how noticeable popping artifacts are since objects may po
 \includegraphics[width=\textwidth]{Images/Graphs/480-3000.pdf}
 \label{fig:graph-3000}
 \captionfonts
-\caption[Query Cap of 3000]{Data for a scene with a query cap of 3000.  TODO: make the caption not be messed up like this.}
+\caption[Query Cap of 3000]{Data for a scene with a query cap of 3000.}
 \end{center}
 \end{figure}
 
@@ -1432,7 +1430,7 @@ This is a good test of how noticeable popping artifacts are since objects may po
 \includegraphics[width=\textwidth]{Images/Graphs/480-4000.pdf}
 \label{fig:graph-4000}
 \captionfonts
-\caption[Query Cap of 4000]{Data for a scene with a query cap of 4000.  TODO: make the caption not be messed up like this.}
+\caption[Query Cap of 4000]{Data for a scene with a query cap of 4000.}
 \end{center}
 \end{figure}
 
