@@ -1475,6 +1475,29 @@ The CPU stall from gathering query results from last frame mentioned earlier wou
 The query results would likely be ready by the time the engine is done updating the rest of the game.
 There may also be room for parallelizing some portions of this algorithm, such as the sorting of alpha blended objects mentioned earlier.
 
+There are some portions of the scene where the culling algorithm brings down the framerate rather than boosting it.
+This is usually in areas of the scene where there are very few objects on the other side of a wall.
+It is strongly dependent on the camera position and viewing angle.
+It may be worth finding a way to turn culling off in some areas for certain points of view, especially if this is an area where the environment won't change too much.
+This can possibly be done by comparing the number of non-empty cells versus the number of cells traversed.
+If the number of non-empty cells is a low enough percentage, the algorithm can cache the approximate camera position and viewing direction to be reused in later frames to increase performance in those areas.
+
+It should also be possible to keep a hierarchy of grids to support very large environments with uneven distribution of geometry as shown in Figure \ref{fig:grid-hierarchy}.
+The top level of the hierarchy is very sparse and is used to organize the grids beneath it.
+The leaves of the hierarchy are the grids themselves and can be at varying degrees of sparseness.
+The frustum rasterizing algorithm first traverses the outermost grid using the front to back heuristic.
+For each cell in the outermost grid, the frustum is clipped down to fit within the cell.
+Then the front to back heuristic is performed on the grid contained within the outer grid cell.
+
+\begin{figure}
+\begin{center}
+\includegraphics[width=0.75\textwidth]{Images/HierarchyCells.png}
+\label{fig:grid-hierarchy}
+\captionfonts
+\caption[Grid Hierarchy]{A grid hierarchy.}
+\end{center}
+\end{figure}
+
 \appendix
 
 \chapter{The 3D Rasterizing Algorithm}
