@@ -1609,7 +1609,7 @@ When the counter runs out that point also gets added to the point buffer for the
 \label{rasterizing-the-slices}
 
 At this point it can be possible to use standard 2D polygon rasterizing algorithms, but a few edge cells may sometimes be missed.
-To ensure all cells are traversed that intersect with the edges, a slightly modified 2D rasterizing algorithm is used.
+To ensure all cells are traversed that intersect with the edges, a custom 2D rasterizing algorithm is used.
 The 2D convex polygon found in Section \ref{slicing-mesh-edge-list} is scan converted row by row in the grid as shown in Figure \ref{fig:rasterized-row}.
 The range of cells to be rasterized for each row needs to be found.
 
