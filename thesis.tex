@@ -1103,14 +1103,14 @@ We are now storing the last frame that the cell query will be valid ahead in tim
 It is also necessary to store if the cell was visible or not.
 The 64th bit can just be a one or a zero to store a boolean of the query result.
 Now there are only 63 used bits to store the query frame, which is still more than enough.
-The bit layout is illustrated in Figure \ref{fig:query-bits}.
+The query result storage is illustrated in Figure \ref{fig:query-storage}.
 
 \begin{figure}
 \begin{center}
-\includegraphics[width=\textwidth]{Images/QueryBits.pdf}
+\includegraphics[width=0.75\textwidth]{Images/QueryStorage.png}
 \captionfonts
-\caption[Query Results Bit Layout]{The bit layout of stored query results. Bit 63 stores whether or not the cell is visible. The rest of the bits store the last frame until the cell needs to be requeried again.}
-\label{fig:query-bits}
+\caption[Query Results Storage]{For each cell, the query visibility status and frame are stored.  Notice how some cells are marked as visible but their frame is less than the scene's frame, meaning the cell is still invisible.  It is time to requery that cell.}
+\label{fig:query-storage}
 \end{center}
 \end{figure}
 
@@ -1383,6 +1383,7 @@ Lower numbers improve performance, but cause more noticeable popping than higher
 To test the engine, a flythrough is recorded storing camera positions and orientations at different times.
 The engine plays this flythrough back, ensuring the same areas are revisited at every test during the experiment.
 Various statistics are recorded each frame and logged so they can be displayed in graph form in Figures \ref{fig:graph-3000} and \ref{fig:graph-4000}.
+Figure \ref{fig:average-relative} shows the framerate relative to the average of the entire run.
 (TODO: fix the figure references.  This is supposed to point to figures 5.6 and 5.7)
 
 The graph shows the performance metrics at different points in time during the flythrough.
@@ -1435,6 +1436,15 @@ This is a good test of how noticeable popping artifacts are since objects may po
 \end{center}
 \end{figure}
 
+\begin{figure}
+\begin{center}
+\includegraphics[width=\textwidth]{Images/Graphs/AverageRelative.pdf}
+\label{fig:average-relative}
+\captionfonts
+\caption[Framerate Relative To Average]{Showing the framerate relative to the average framerate.  The top graph is for a query limit of 3000 and the bottom graph is for a query limit of 4000.  The horizontal lines mark the average framerates.}
+\end{center}
+\end{figure}
+
 \section{Conclusions}
 \label{conclusions}
 These results show that there is a relationship between the framerate and the number of objects rendered.
@@ -1443,6 +1453,9 @@ The scene was also tried with a query cap of 2000 but the popping artifacts were
 
 When occlusion culling is turned off, the framerate can fluctuate between high values and back down to values around 30 and at times go even lower.
 The framerate can be seen to dip when the number of rendered nodes jumps up to high values.
+The graph in Figure \ref{fig:average-relative} shows that with occlusion culling turned off, the framerate tends to jump down to below average and fluctuate much more noticeably.
+This would create very jittery performance which is undesireable.
+If the scene had more objects to add even more detail, occlusion culling being off would produce even worse performance.
 
 The different grid sizes can be seen to produce different performance depending on if the camera is looking at outdoor portions of the scene or at indoor portions.
 The sparser grid performs better outside, while the tighter grid performs better inside.
