@@ -1515,6 +1515,8 @@ When dealing with view frustums, the eight points that make up the shape are nee
 The frustum consists of six planes.
 Each point is derived from finding the intersection point between the three corresponding planes adjacent to that point.
 Once the points are found, a list of edges that joins those points gets built with an example shown in Figure \ref{fig:point-edge-list}.
+The edge list is hardcoded and not computed automatically since we know the shape of the frustum.
+For example, an edge is formed between the top-left-near point and the top-left-far point.
 This mesh edge list is now the stored representation of the convex 3D mesh that will be rasterized.
 
 \begin{figure}
