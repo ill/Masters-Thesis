@@ -311,7 +311,7 @@ The high detail objects that are rendered are also automatically occluding parts
 A scene traversal heuristic is also presented.
 The heuristic traverses the cells of the spatial data structure in the scene in a front to back order relative to the camera view.
 If the objects in front are drawn before the objects behind, the objects behind can be tested against those already drawn objects.
-This reduces false positives in visibility tests because objects in back aren't mistakenly determined to be visible if the objects in front are processed first.
+This reduces false positives in visibility tests because objects in back are not mistakenly determined to be visible if the objects in front are processed first.
 
 \chapter{Background}
 \label{background}
@@ -722,7 +722,7 @@ In practice, view frustums are very wide.
 A camera using a standard 90 degree vertical field of view on a 16:9 wide screen monitor will create a horizontal field of about 160 degrees.
 Wide frustums cause cells that should have been occluded to be traversed before the cells that occlude them as shown in Figure \ref{fig:wide-frustum-iter}.
 In this case cell 0 is most likely occluded by cells 32, 21, 22, 23, 24, 12, 13, 14, 15, and so on.
-Even if the camera is staring straight at a wall, cells 21, 22, 23, and the others will falsely pass the occlusion queries because the wall in cell 32 hasn't been rendered to the z-buffer yet.
+Even if the camera is staring straight at a wall, cells 21, 22, 23, and the others will falsely pass the occlusion queries because the wall in cell 32 has not been rendered to the z-buffer yet.
 
 \begin{figure}
 \begin{center}
@@ -963,7 +963,7 @@ Color write should be disabled.
 Blending should be disabled since only solid geometry is rendered during this stage.
 Depth test should be enabled with a depth function of less than.
 Depth write should be enabled when rendering objects, and disabled when rendering a cell during a cell query.
-Backface culling should be disabled when rendering a cell when the camera is inside of a cell or else the cell won't be visible.
+Backface culling should be disabled when rendering a cell when the camera is inside of a cell or else the cell will not be visible.
 
 \begin{lstlisting}
 disable blend
@@ -1214,7 +1214,7 @@ for each grid cell traversed
           ++numFramesOverflowed
           recordedOverflow = true
 
-      //perform the query if the query cap hasn't been hit or if the cell was visible
+      //perform the query if the query cap has not been hit or if the cell was visible
       if numQueries < queryCap or visible
         //cell is completely invisible, but still tested in queries
         begin occlusion query
@@ -1278,7 +1278,7 @@ Once the scene is traversed, the objects can now be rendered in color.
 \section{Environment}
 \label{environment}
 
-The current implementation doesn't take advantage of multithreading due to the difficulty in trying to have a good multithreaded design while experimenting with different ideas, so the number of cores isn't as much a deciding factor in performance as the speed of the processor itself.
+The current implementation does not take advantage of multithreading due to the difficulty in trying to have a good multithreaded design while experimenting with different ideas, so the number of cores is not as much a deciding factor in performance as the speed of the processor itself.
 
 The system this was tested on is a custom built desktop tower with an Intel i5-750 processor running at 2.67 GHz and is running Windows 8 64 bit.
 It has 6 Gigabytes of RAM.
@@ -1294,7 +1294,7 @@ The tested executable is built for 64 bit using Visual Studio 2012.
 A limited deferred shading renderer is used to display the scenes.
 A deferred shading renderer performs the lighting in a separate pass from rendering the geometry, allowing for a very large number of dynamic lights.
 The renderer is capable of performing normal mapping, specular highlights, and rendering only solid geometry.
-It's able to light the scene with point lights, spot lights, and a directional volume light for lighting up large areas.
+It is able to light the scene with point lights, spot lights, and a directional volume light for lighting up large areas.
 More features are planned for the future.
 
 \section{Test Scene}
@@ -1483,7 +1483,7 @@ Skeletal animations, particle systems, shadows, and various post processing effe
 Cascaded shadow maps are often used for large outdoor environments to cast shadows from sunlight or other global outdoor sources.\cite{ms-cascaded-shadow}
 The paper mentioned earlier a method for supporting multiple viewports for split screen multiplayer in section \ref{supporting-multiple-viewports}.
 A viewport can be created for the point of view of the outdoor global light source since a large portion of the scene needs to be rendered to the shadow map.
-For smaller light volumes, it's best to avoid using the hardware occlusion queries and to just render objects that are within the view frustum from the light's point of view.
+For smaller light volumes, it is best to avoid using the hardware occlusion queries and to just render objects that are within the view frustum from the light's point of view.
 The bookkeeping required for each viewport that uses this algorithm would be impractical for that many lights.
 
 The graphics engine was originally a fully featured multi threaded game engine.
@@ -1498,7 +1498,7 @@ There may also be room for parallelizing some portions of this algorithm, such a
 There are some portions of the scene where the culling algorithm brings down the framerate rather than boosting it.
 This is usually in areas of the scene where there are very few objects on the other side of a wall.
 It is strongly dependent on the camera position and viewing angle.
-It may be worth finding a way to turn culling off in some areas for certain points of view, especially if this is an area where the environment won't change too much.
+It may be worth finding a way to turn culling off in some areas for certain points of view, especially if this is an area where the environment will not change too much.
 This can possibly be done by comparing the number of non-empty cells versus the number of cells traversed.
 If the number of non-empty cells is a low enough percentage, the algorithm can cache the approximate camera position and viewing direction to be reused in later frames to increase performance in those areas.
 
