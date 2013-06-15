@@ -37,6 +37,7 @@
     \usepackage{graphicx}
 \fi
 
+\usepackage{float}
 \usepackage{amssymb}
 \usepackage{amsmath}
 \usepackage[letterpaper]{geometry}
@@ -214,7 +215,7 @@ It is relatively easy to avoid drawing portions of the scene that are not in the
 If a camera is looking at a wall or a mountain in the distance, it is also best to avoid drawing the objects behind them.
 Figuring out that objects are behind other objects in real-time is a challenge but can save many unnecessary draw calls to the GPU.
 
-\begin{figure}
+\begin{figure}[H]
 \begin{center}
 \includegraphics[width=0.5\textwidth]{Images/frustum.png}
 \captionfonts
@@ -651,7 +652,7 @@ Figure \ref{fig:vf-and-occluders} shows a top down view of a scene.
 Objects closer to the camera get rendered to the z-buffer before objects in the back do.
 Cells farther from the camera get tested against the objects in front that are potentially occluding them since they are in the z-buffer.
 
-\begin{figure}
+\begin{figure}[H]
 \begin{center}
 \includegraphics[width=0.75\textwidth]{Images/frustFigure.png}
 \captionfonts
@@ -666,7 +667,7 @@ A 3D DDA line rasterizing algorithm would be used to traverse the cells along a 
 This method was rejected early on.
 It was non-trivial to find out the best way to align the rays so that duplicate cell traversals were minimized and absolutely no cells were ever missed.
 
-\begin{figure}
+\begin{figure}[H]
 \begin{center}
 \includegraphics[width=0.75\textwidth]{Images/rayTraversal.png}
 \captionfonts
@@ -791,7 +792,7 @@ Each slice is now a 2D polygon, so a modified 2D rasterizer is used similar to e
 For each row in the slice, the range of cells to be traversed is computed as shown in Figure \ref{fig:scene-frust-row}.
 The full implementation is presented in the Appendix in Chapter \ref{rasterizing-algorithm}.
 
-\begin{figure}
+\begin{figure}[H]
 \begin{center}
 \includegraphics[width=0.5\textwidth]{Images/RasterizingAlgorithm/Final/Frust.png}
 \captionfonts
@@ -829,7 +830,7 @@ After that the Person should be tested against the Tank and Tree A.
 Then Tree B gets tested against everything else.
 This would require the objects to be drawn in the order, Tree A, Tank, Person, Tree B.
 
-\begin{figure}
+\begin{figure}[H]
 \begin{center}
 \includegraphics[width=0.75\textwidth]{Images/sample-scene.pdf}
 \captionfonts
@@ -901,7 +902,7 @@ The third setting of ``never'' is for the tiny objects that add detail, such as 
 In a fully detailed environment it is likely that there will be very many of these objects.
 They are likely to not contribute much to the occlusion and rendering them during this phase can be a waste.
 
-\begin{figure}
+\begin{figure}[H]
 \begin{center}
 \includegraphics[width=0.9\textwidth]{Images/HangarCorner.jpg}
 \captionfonts
@@ -910,7 +911,7 @@ They are likely to not contribute much to the occlusion and rendering them durin
 \end{center}
 \end{figure}
 
-\begin{figure}
+\begin{figure}[H]
 \begin{center}
 \includegraphics[width=0.9\textwidth]{Images/HangarEntrance.jpg}
 \captionfonts
@@ -1067,7 +1068,7 @@ Cells that have not been queried in previous frames have a chance to be queried 
 This can cause slightly more noticeable pop-in of objects while moving since some cells get queried a few frames later at the cost of keeping the frame rate higher as shown in \ref{fig:hall-doorway}.
 The frame rate being high reduces the real-time it takes for an object to pop-in, making it less noticeable anyway, so this tends to be a good tradeoff.
 
-\begin{figure}
+\begin{figure}[H]
 \begin{center}
 \includegraphics[width=\textwidth]{Images/HallDoorway.jpg}
 \captionfonts
@@ -1084,7 +1085,7 @@ When a large amount of cells needs to be queried, some cells never have a chance
 Cells early in the frustum traversal whose query results have expired eat up the queries that farther away cells need to become visible.
 If 40,000 cells need to be queried, and non-visible cell results last only 2 frames, those same non-visible cells will keep executing queries.
 
-\begin{figure}
+\begin{figure}[H]
 \begin{center}
 \includegraphics[width=\textwidth]{Images/MissingPatches.jpg}
 \captionfonts
@@ -1104,7 +1105,7 @@ The 64th bit can just be a one or a zero to store a boolean of the query result.
 Now there are only 63 used bits to store the query frame, which is still more than enough.
 The query result storage is illustrated in Figure \ref{fig:query-storage}.
 
-\begin{figure}
+\begin{figure}[H]
 \begin{center}
 \includegraphics[width=0.75\textwidth]{Images/QueryStorage.png}
 \captionfonts
@@ -1116,6 +1117,8 @@ The query result storage is illustrated in Figure \ref{fig:query-storage}.
 The following pseudo code shows how the current implementation takes into account the number of frames in a row the query cap was hit.
 This is a slight modification of the previous pseudo code that was retrieving cell query results.
 The invisibilityDurationGrowth variable should be smaller than the visibilityDurationGrowth variable to keep the previously described popping artifacts at a minimum while moving.
+
+\pagebreak
 
 \begin{lstlisting}
 //encodes or decodes the cell's frame given a 64 bit integer
@@ -1311,13 +1314,17 @@ The outdoor area is a combination of several directional volume lights and rando
 There is currently no heightmap terrain rendering system in place, so the terrain is composed of a set of meshes from a model that was split into 100 pieces as a temporary solution.
 This scene is approximately 1250 x 750 x 1250 meters in size.
 
-\begin{figure}
+\begin{figure}[H]
 \begin{center}
 \includegraphics[width=\textwidth]{Images/GraveyardOverview.jpg}
 \captionfonts
 \caption[Teapot Graveyard Overview]{Overview of Teapot Graveyard.}
 \label{fig:graveyard-overview}
+\end{center}
+\end{figure}
 
+\begin{figure}[H]
+\begin{center}
 \includegraphics[width=\textwidth]{Images/TeapotGraveyard.jpg}
 \captionfonts
 \caption[Teapot Graveyard]{A view of the outdoor portion of the Teapot Graveyard map.}
@@ -1325,28 +1332,30 @@ This scene is approximately 1250 x 750 x 1250 meters in size.
 \end{center}
 \end{figure}
 
-\begin{figure}
+\begin{figure}[H]
 \begin{center}
 \includegraphics[width=\textwidth]{Images/HangarEntrance.jpg}
 \captionfonts
 \caption[Hangar Entrance]{Entrance into the Hangar area.}
 \label{fig:hangar-entrance}
+\end{center}
+\end{figure}
 
+\begin{figure}[H]
+\begin{center}
 \includegraphics[width=\textwidth]{Images/Hangar.jpg}
 \captionfonts
 \caption[Hangar]{A view of the underground Hangar of the Teapot Graveyard.}
 \label{fig:hangar}
-
 \end{center}
 \end{figure}
 
-\begin{figure}
+\begin{figure}[H]
 \begin{center}
 \includegraphics[width=\textwidth]{Images/HallCorner.jpg}
 \captionfonts
 \caption[Hall Corner]{Side hallways of the Hangar in Teapot Graveyard.}
 \label{fig:hall-corner}
-
 \end{center}
 \end{figure}
 
@@ -1416,7 +1425,7 @@ In this portion of the flythrough, the camera is positioned in the hallway looki
 The camera then moves side to side so that it looks at the wall around the doorway for a bit.
 This is a good test of how noticeable popping artifacts are since objects may pop in when the camera suddenly can see into the hangar when it was previously looking at a wall.
 
-\begin{figure}
+\begin{figure}[H]
 \begin{center}
 \includegraphics[width=\textwidth]{Images/Graphs/480-3000.pdf}
 \label{fig:graph-3000}
@@ -1425,7 +1434,7 @@ This is a good test of how noticeable popping artifacts are since objects may po
 \end{center}
 \end{figure}
 
-\begin{figure}
+\begin{figure}[H]
 \begin{center}
 \includegraphics[width=\textwidth]{Images/Graphs/480-4000.pdf}
 \label{fig:graph-4000}
@@ -1434,7 +1443,7 @@ This is a good test of how noticeable popping artifacts are since objects may po
 \end{center}
 \end{figure}
 
-\begin{figure}
+\begin{figure}[H]
 \begin{center}
 \includegraphics[width=\textwidth]{Images/Graphs/AverageRelative.pdf}
 \label{fig:average-relative}
@@ -1500,7 +1509,7 @@ The frustum rasterizing algorithm first traverses the outermost grid using the f
 For each cell in the outermost grid, the frustum is clipped down to fit within the cell.
 Then the front to back heuristic is performed on the grid contained within the outer grid cell.
 
-\begin{figure}
+\begin{figure}[H]
 \begin{center}
 \includegraphics[width=0.75\textwidth]{Images/HierarchyCells.png}
 \label{fig:grid-hierarchy}
@@ -1530,7 +1539,7 @@ The edge list is hardcoded and not computed automatically since we know the shap
 For example, an edge is formed between the top-left-near point and the top-left-far point.
 This mesh edge list is now the stored representation of the convex 3D mesh that will be rasterized.
 
-\begin{figure}
+\begin{figure}[H]
 \begin{center}
 \includegraphics[width=0.5\textwidth]{Images/RasterizingAlgorithm/Final/Frust.png}
 \captionfonts
@@ -1581,7 +1590,7 @@ The grid cells then need to be converted back to world space to map to the grid 
 The 3D mesh edge list now has slices of it taken and then projected into 2D to later be rasterized with a 2D polygon rasterizing algorithm.
 This is done in increments based on the grid size as shown in Figure \ref{fig:edge-list-slice}.
 
-\begin{figure}
+\begin{figure}[H]
 \begin{center}
 \includegraphics[width=0.5\textwidth]{Images/RasterizingAlgorithm/Final/FrustSlice.png}
 \captionfonts
@@ -1593,7 +1602,7 @@ This is done in increments based on the grid size as shown in Figure \ref{fig:ed
 The mesh edges that intersect with the grid edges get clipped to leave behind sets of points.
 These points are projected into 2D and then the monotone chain algorithm is used again to create a 2D convex mesh as shown in Figure \ref{fig:projected-slice}.
 
-\begin{figure}
+\begin{figure}[H]
 \begin{center}
 \includegraphics[width=0.5\textwidth]{Images/RasterizingAlgorithm/Final/SliceOrtho.png}
 \captionfonts
@@ -1624,7 +1633,7 @@ To ensure all cells are traversed that intersect with the edges, a custom 2D ras
 The 2D convex polygon found in Section \ref{slicing-mesh-edge-list} is scan converted row by row in the grid as shown in Figure \ref{fig:rasterized-row}.
 The range of cells to be rasterized for each row needs to be found.
 
-\begin{figure}
+\begin{figure}[H]
 \begin{center}
 \includegraphics[width=0.5\textwidth]{Images/RasterizingAlgorithm/Final/FrustSliceNRowOrthoLabeled.png}
 \captionfonts
@@ -1644,7 +1653,7 @@ Again, a countdown is formed until the end of the current active edge based on t
 Now, if an edge is facing outward, it is clipped against the top of the row and if facing inward it is clipped against the bottom.
 The range of cells to rasterize for the row is derived from these points as shown in Figure \ref{fig:finding-row-range} by computing which grid cell the point is in.
 
-\begin{figure}
+\begin{figure}[H]
 \begin{center}
 \includegraphics[width=0.5\textwidth]{Images/RasterizingAlgorithm/Final/RasterizingInOut.png}
 \captionfonts
@@ -1657,7 +1666,7 @@ As the point list is being traversed, the edge may switch from facing outward to
 Due to being a convex polygon, the edge will never face outward again.
 The point between an outward facing edge and an inward facing edge as shown in Figure \ref{fig:finding-row-range-switch} is now used to determine the row range by computing which grid cell the point is in.
 
-\begin{figure}
+\begin{figure}[H]
 \begin{center}
 \includegraphics[width=0.5\textwidth]{Images/RasterizingAlgorithm/Final/RasterizingOuterInnerSwitch.png}
 \captionfonts
