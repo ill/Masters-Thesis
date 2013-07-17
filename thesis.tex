@@ -136,7 +136,7 @@ It also requires very little work from the artists who design the scenes since n
 \tableofcontents
 
 
-\listoftables
+%\listoftables
 
 \listoffigures
 
@@ -164,7 +164,7 @@ It also requires very little work from the artists who design the scenes since n
 
 Real time computer graphics are needed for CAD applications, simulations, video games, and even for just displaying the user interface of an operating system.
 Computer graphics can be non real-time, for example when doing CGI for a movie.
-Each frame can take hours to render, and the result is a very photorealistic image that looks like is real life itself.
+Each frame can take hours to render, and the result is a very photorealistic image that looks like it is real life itself.
 Millions of frames are generated only for each still frame to be visible for a fraction of a second until the next frame to give the illusion of motion.
 Real time graphics also display a frame for only a fraction of a second but are rendered on the fly right as the user is controlling the application.
 This means the computer only has 33.33 milliseconds if trying to render at 30 frames per second (FPS).
@@ -181,11 +181,11 @@ It is possible to have non-photo realistic graphics as well like the character f
 \begin{center}
 \includegraphics[width=\textwidth]{Images/BF3.jpg}
 \captionfonts
-\caption[Battlefield 3]{The photorealistic real-time graphics of Battlefield 3.\cite{bf3}}
+\caption[The photorealistic real-time graphics of Battlefield 3.]{The photorealistic real-time graphics of Battlefield 3.\cite{bf3}}
 \label{fig:bf3}
 \includegraphics[width=\textwidth]{Images/Borderlands_2.png}
 \captionfonts
-\caption[Borderlands 2]{The comic book style of Borderlands 2.\cite{border2}}
+\caption[The comic book style of Borderlands 2.]{The comic book style of Borderlands 2.\cite{border2}}
 \label{fig:borderlands2}
 \end{center}
 \end{figure}
@@ -219,7 +219,7 @@ Figuring out that objects are behind other objects in real-time is a challenge b
 \begin{center}
 \includegraphics[width=0.5\textwidth]{Images/frustum.png}
 \captionfonts
-\caption[View Frustum]{A camera and its view frustum. A frustum is a pyramid with its top cut off. Objects within the frustum are visible.\cite{vfc-image}}
+\caption[A camera and its view frustum.]{A camera and its view frustum. A frustum is a pyramid with its top cut off. Objects within the frustum are visible.\cite{vfc-image}}
 \label{fig:frustum}
 \end{center}
 \end{figure}
@@ -245,11 +245,11 @@ A wall, column, railing, ladder, or tree may be reused many times in the level, 
 \begin{center}
 \includegraphics[width=\textwidth]{Images/Hangar.jpg}
 \captionfonts
-\caption[Hangar]{A view of the Hangar in the environment made for this project.}
+\caption[A view of the Hangar in the environment made for this project.]{A view of the Hangar in the environment made for this project.}
 \label{fig:hangar-view}
 \includegraphics[width=\textwidth]{Images/Peices.jpg}
 \captionfonts
-\caption[Hangar Modular Pieces]{Some of the modular pieces that make up the hangar.}
+\caption[Some of the modular pieces that make up the hangar.]{Some of the modular pieces that make up the hangar.}
 \label{fig:hangar-peices}
 \end{center}
 \end{figure}
@@ -289,7 +289,7 @@ If an object is destructible, the low resolution mesh must somehow be deformable
 \begin{center}
 \includegraphics[width=0.75\textwidth]{Images/OccluderGeomFig.jpg}
 \captionfonts
-\caption[Occluder Geometry]{The detailed wall and its associated low detail occluder geometry shown in red.}
+\caption[The detailed wall and its associated low detail occluder geometry shown in red.]{The detailed wall and its associated low detail occluder geometry shown in red.}
 \label{fig:occluder-geometry}
 \end{center}
 \end{figure}
@@ -362,7 +362,7 @@ The depth test is also essential for hardware occlusion queries which will be de
 \begin{center}
 \includegraphics[width=0.5\textwidth]{Images/Z_buffer.png}
 \captionfonts
-\caption[Z Buffer]{Example of a Z Buffer}
+\caption[Example of a Z Buffer.]{Example of a Z Buffer.}
 \label{fig:z-buffer}
 \end{center}
 \end{figure}
@@ -488,7 +488,7 @@ The scene's zones are traversed this way until no more portals are determined to
 \begin{center}
 \includegraphics[width=0.75\textwidth]{Images/Portal-Culling.png}
 \captionfonts
-\caption[Portal Culling]{An example of portal culling at work.  Zones A, B, C, and E are rendered.}
+\caption[An example of portal culling at work.]{An example of portal culling at work.  Zones A, B, C, and E are rendered.}
 \label{fig:portal-culling}
 \end{center}
 \end{figure}
@@ -530,7 +530,7 @@ Objects such as tanks or soldiers have their bounding rectangle tested against t
 \begin{center}
 \includegraphics[width=0.75\textwidth]{Images/Bf3Buffer.jpg}
 \captionfonts
-\caption[Software Z Buffer Buffer]{The low resolution software z-buffer from a scene in Battlefield 3.\cite{culling-bf}}
+\caption[The low resolution software z-buffer from a scene in Battlefield 3.]{The low resolution software z-buffer from a scene in Battlefield 3.\cite{culling-bf}}
 \label{fig:softare-z}
 \end{center}
 \end{figure}
@@ -546,7 +546,7 @@ CryENGINE also allows for use of portals and occlusion geometry that they refer 
 \begin{center}
 \includegraphics[width=0.5\textwidth]{Images/CryCoverage.jpg}
 \captionfonts
-\caption[Cry Engine Coverage Buffer]{The coverage buffer used in CryENGINE 3.  The red portions are the holes after reprojecting from previous frames to the current camera angle.\cite{cryengine3}}
+\caption[The coverage buffer used in CryENGINE 3.]{The coverage buffer used in CryENGINE 3.  The red portions are the holes after reprojecting from previous frames to the current camera angle.\cite{cryengine3}}
 \label{fig:cry-coverage}
 \end{center}
 \end{figure}
@@ -593,7 +593,7 @@ Color and depth write are disabled and just the box of the cell is rendered.
 \begin{center}
 \includegraphics[width=0.75\textwidth]{Images/sceneAlgorithm/00.png}
 \captionfonts
-\caption[A Scene]{The overall scene partitioned by a uniform grid.  The green cone represents the camera's field of view.}
+\caption[The overall scene partitioned by a uniform grid.]{The overall scene partitioned by a uniform grid.  The green cone represents the camera's field of view.}
 \label{fig:algorithm-00}
 \end{center}
 \end{figure}
@@ -607,7 +607,7 @@ Figure \ref{fig:algorithm-01} shows a moment in time during the frustum traversa
 \begin{center}
 \includegraphics[width=0.75\textwidth]{Images/sceneAlgorithm/01.png}
 \captionfonts
-\caption[Traversing The Camera View]{A moment in time.  The objects are white to show that they are only rendered to the depth buffer at this stage.  The cells of the grid within the camera's view are being traversed.  Green represents cells visible to the camera.  Red represents occluded cells.}
+\caption[A moment in time of traversing the camera's view.]{A moment in time of traversing the camera's view.  The objects are white to show that they are only rendered to the depth buffer at this stage.  The cells of the grid within the camera's view are being traversed.  Green represents cells visible to the camera.  Red represents occluded cells.}
 \label{fig:algorithm-01}
 \end{center}
 \end{figure}
@@ -619,7 +619,7 @@ Figure \ref{fig:algorithm-03} shows a full color scene with objects being render
 \begin{center}
 \includegraphics[width=0.75\textwidth]{Images/sceneAlgorithm/02.png}
 \captionfonts
-\caption[Traversed Camera View]{The scene fully traversed.}
+\caption[The scene fully traversed.]{The scene fully traversed.}
 \label{fig:algorithm-02}
 \end{center}
 \end{figure}
@@ -628,7 +628,7 @@ Figure \ref{fig:algorithm-03} shows a full color scene with objects being render
 \begin{center}
 \includegraphics[width=0.75\textwidth]{Images/sceneAlgorithm/03.png}
 \captionfonts
-\caption[Rendered Scene]{The scene is now rendered in full color.}
+\caption[The scene is now rendered in full color.]{The scene is now rendered in full color.}
 \label{fig:algorithm-03}
 \end{center}
 \end{figure}
@@ -656,7 +656,7 @@ Cells farther from the camera get tested against the objects in front that are p
 \begin{center}
 \includegraphics[width=0.75\textwidth]{Images/frustFigure.png}
 \captionfonts
-\caption[View Frustum and Occluders]{A view frustum, and the objects inside occluding each other.}
+\caption[A view frustum, and the objects inside occluding each other.]{A view frustum, and the objects inside occluding each other.}
 \label{fig:vf-and-occluders}
 \end{center}
 \end{figure}
@@ -671,7 +671,7 @@ It was non-trivial to find out the best way to align the rays so that duplicate 
 \begin{center}
 \includegraphics[width=0.75\textwidth]{Images/rayTraversal.png}
 \captionfonts
-\caption[Ray Based Traversal]{Showing an example of ray based frustum traversal. The cells in front get traversed multiple times.}
+\caption[Showing an example of ray based frustum traversal.]{Showing an example of ray based frustum traversal. The cells in front get traversed multiple times.}
 \label{fig:vf-ray-traversal}
 \end{center}
 \end{figure}
@@ -689,7 +689,7 @@ Modifying the algorithm to avoid this, especially extended to 3D, was not trivia
 \begin{center}
 \includegraphics[width=0.75\textwidth]{Images/chess-metric.png}
 \captionfonts
-\caption[Chessboard Metric]{The chessboard metric in action.}
+\caption[The chessboard metric in action.]{The chessboard metric in action.}
 \label{fig:chess-metric}
 \end{center}
 \end{figure}
@@ -710,7 +710,7 @@ This depth sorting can even be parallelized by using a separate thread per cell,
 \begin{center}
 \includegraphics[width=0.75\textwidth]{Images/frustum-iter.png}
 \captionfonts
-\caption[View Frustum Traversal]{Occlusion order traversal.}
+\caption[Occlusion order traversal.]{Occlusion order traversal.}
 \label{fig:frustum-iter}
 \end{center}
 \end{figure}
@@ -728,7 +728,7 @@ Even if the camera is staring straight at a wall, cells 21, 22, 23, and the othe
 \begin{center}
 \includegraphics[width=0.75\textwidth]{Images/wide-frustum.png}
 \captionfonts
-\caption[Incorrect Wide View Frustum Traversal]{Incorrect traversal of angled wide view frustum.}
+\caption[Incorrect traversal of angled wide view frustum.]{Incorrect traversal of angled wide view frustum.}
 \label{fig:wide-frustum-iter}
 \end{center}
 \end{figure}
@@ -746,7 +746,7 @@ This keeps a better occluder order and prevents more cells from being falsley de
 \begin{center}
 \includegraphics[width=0.75\textwidth]{Images/wide-traversal.png}
 \captionfonts
-\caption[Correct Wide View Frustum]{Correct traversal of split angled wide view frustum.}
+\caption[Correct traversal of split angled wide view frustum.]{Correct traversal of split angled wide view frustum.}
 \label{fig:correct-wide-frustum-iter}
 \end{center}
 \end{figure}
@@ -796,7 +796,7 @@ The full implementation is presented in the Appendix in Chapter \ref{rasterizing
 \begin{center}
 \includegraphics[width=0.5\textwidth]{Images/RasterizingAlgorithm/Final/Frust.png}
 \captionfonts
-\caption[A Frustum]{A view frustum within the bounds of a scene.}
+\caption[A view frustum within the bounds of a scene.]{A view frustum within the bounds of a scene.}
 \label{fig:scene-frust}
 \end{center}
 \end{figure}
@@ -805,7 +805,7 @@ The full implementation is presented in the Appendix in Chapter \ref{rasterizing
 \begin{center}
 \includegraphics[width=0.5\textwidth]{Images/RasterizingAlgorithm/Final/FrustSlice.png}
 \captionfonts
-\caption[A Frustum Slice]{A 2D slice of the same frustum seen from the side.}
+\caption[A 2D slice of the same frustum seen from the side.]{A 2D slice of the same frustum seen from the side.}
 \label{fig:scene-frust-slice}
 \end{center}
 \end{figure}
@@ -814,7 +814,7 @@ The full implementation is presented in the Appendix in Chapter \ref{rasterizing
 \begin{center}
 \includegraphics[width=0.5\textwidth]{Images/RasterizingAlgorithm/Final/FrustSliceNRowOrthoLabeled.png}
 \captionfonts
-\caption[A Frustum Slice And Row]{A row from the slice being rasterized.}
+\caption[A row from the slice being rasterized.]{A row from the slice being rasterized.}
 \label{fig:scene-frust-row}
 \end{center}
 \end{figure}
@@ -834,7 +834,7 @@ This would require the objects to be drawn in the order, Tree A, Tank, Person, T
 \begin{center}
 \includegraphics[width=0.75\textwidth]{Images/sample-scene.pdf}
 \captionfonts
-\caption[A scene]{A scene.}
+\caption[A scene.]{A scene.}
 \label{fig:a-scene}
 \end{center}
 \end{figure}
@@ -906,7 +906,7 @@ They are likely to not contribute much to the occlusion and rendering them durin
 \begin{center}
 \includegraphics[width=0.9\textwidth]{Images/HangarCorner.jpg}
 \captionfonts
-\caption[Hangar Corner]{Here the walls, ceiling, and floors are marked to always render during the depth pre-pass.  The fighter jets inside the hangars are marked to sometimes render.  The lamps on the floor and clamps holding the jets in place are marked to never render.}
+\caption[Here the walls, ceiling, and floors are marked to always render during the depth pre-pass.]{Here the walls, ceiling, and floors are marked to always render during the depth pre-pass.  The fighter jets inside the hangars are marked to sometimes render.  The lamps on the floor and clamps holding the jets in place are marked to never render.}
 \label{fig:hangar-corner}
 \end{center}
 \end{figure}
@@ -915,7 +915,7 @@ They are likely to not contribute much to the occlusion and rendering them durin
 \begin{center}
 \includegraphics[width=0.9\textwidth]{Images/HangarEntrance.jpg}
 \captionfonts
-\caption[Hangar Entrance]{Here the building, underground tunnel walls, and the terrain are set to always render during the depth pre-pass.  The teapots and jets are set to sometimes render.  The red lamps on the building are set to never render.}
+\caption[Here the building, underground tunnel walls, and the terrain are set to always render during the depth pre-pass.]{Here the building, underground tunnel walls, and the terrain are set to always render during the depth pre-pass.  The teapots and jets are set to sometimes render.  The red lamps on the building are set to never render.}
 \label{fig:hangar-entrance_}
 \end{center}
 \end{figure}
@@ -1030,11 +1030,11 @@ If the grid is too sparse, large chunks of the hangar get rendered that should b
 \begin{center}
 \includegraphics[width=\textwidth]{Images/Hangar.jpg}
 \captionfonts
-\caption[Hangar Bay]{Hangar Bay}
+\caption[Hangar Bay.]{Hangar Bay.}
 \label{fig:hangar-bay}
 \includegraphics[width=\textwidth]{Images/HallCorner.jpg}
 \captionfonts
-\caption[Hangar Halls]{Hangar Halls}
+\caption[Hangar Halls.]{Hangar Halls.}
 \label{fig:hangar-halls}
 \end{center}
 \end{figure}
@@ -1072,7 +1072,7 @@ The frame rate being high reduces the real-time it takes for an object to pop-in
 \begin{center}
 \includegraphics[width=\textwidth]{Images/HallDoorway.jpg}
 \captionfonts
-\caption[Hall Doorway]{Moving sideways can make far away objects seen through the door sometimes appear to pop in visibly if someone is really paying attention.
+\caption[Moving sideways can make far away objects seen through the door sometimes appear to pop in visibly if someone is really paying attention.]{Moving sideways can make far away objects seen through the door sometimes appear to pop in visibly if someone is really paying attention.
 A high frame rate and an action packed game help ensure this artifact is hard to notice.}
 \label{fig:hall-doorway}
 \end{center}
@@ -1089,7 +1089,7 @@ If 40,000 cells need to be queried, and non-visible cell results last only 2 fra
 \begin{center}
 \includegraphics[width=\textwidth]{Images/MissingPatches.jpg}
 \captionfonts
-\caption[Missing patches]{Parts of the terrain go missing. Cells containing those objects never have a chance to be queried.}
+\caption[Parts of the terrain go missing.]{Parts of the terrain go missing. Cells containing those objects never have a chance to be queried.}
 \label{fig:missing-patches}
 \end{center}
 \end{figure}
@@ -1109,7 +1109,7 @@ The query result storage is illustrated in Figure \ref{fig:query-storage}.
 \begin{center}
 \includegraphics[width=0.75\textwidth]{Images/QueryStorage.png}
 \captionfonts
-\caption[Query Results Storage]{For each cell, the query visibility status and frame are stored.  Notice how some cells are marked as visible but their frame is less than the scene's frame, meaning the cell is still invisible.  It is time to requery that cell.}
+\caption[For each cell, the query visibility status and frame are stored.]{For each cell, the query visibility status and frame are stored.  Notice how some cells are marked as visible but their frame is less than the scene's frame, meaning the cell is still invisible.  It is time to requery that cell.}
 \label{fig:query-storage}
 \end{center}
 \end{figure}
@@ -1318,7 +1318,7 @@ This scene is approximately 1250 x 750 x 1250 meters in size.
 \begin{center}
 \includegraphics[width=\textwidth]{Images/GraveyardOverview.jpg}
 \captionfonts
-\caption[Teapot Graveyard Overview]{Overview of Teapot Graveyard.}
+\caption[Overview of Teapot Graveyard.]{Overview of Teapot Graveyard.}
 \label{fig:graveyard-overview}
 \end{center}
 \end{figure}
@@ -1327,7 +1327,7 @@ This scene is approximately 1250 x 750 x 1250 meters in size.
 \begin{center}
 \includegraphics[width=\textwidth]{Images/TeapotGraveyard.jpg}
 \captionfonts
-\caption[Teapot Graveyard]{A view of the outdoor portion of the Teapot Graveyard map.}
+\caption[A view of the outdoor portion of the Teapot Graveyard map.]{A view of the outdoor portion of the Teapot Graveyard map.}
 \label{fig:teapot-graveyard}
 \end{center}
 \end{figure}
@@ -1336,7 +1336,7 @@ This scene is approximately 1250 x 750 x 1250 meters in size.
 \begin{center}
 \includegraphics[width=\textwidth]{Images/HangarEntrance.jpg}
 \captionfonts
-\caption[Hangar Entrance]{Entrance into the Hangar area.}
+\caption[Entrance into the Hangar area.]{Entrance into the Hangar area.}
 \label{fig:hangar-entrance}
 \end{center}
 \end{figure}
@@ -1345,7 +1345,7 @@ This scene is approximately 1250 x 750 x 1250 meters in size.
 \begin{center}
 \includegraphics[width=\textwidth]{Images/Hangar.jpg}
 \captionfonts
-\caption[Hangar]{A view of the underground Hangar of the Teapot Graveyard.}
+\caption[A view of the underground Hangar of the Teapot Graveyard.]{A view of the underground Hangar of the Teapot Graveyard.}
 \label{fig:hangar}
 \end{center}
 \end{figure}
@@ -1354,7 +1354,7 @@ This scene is approximately 1250 x 750 x 1250 meters in size.
 \begin{center}
 \includegraphics[width=\textwidth]{Images/HallCorner.jpg}
 \captionfonts
-\caption[Hall Corner]{Side hallways of the Hangar in Teapot Graveyard.}
+\caption[Side hallways of the Hangar in Teapot Graveyard.]{Side hallways of the Hangar in Teapot Graveyard.}
 \label{fig:hall-corner}
 \end{center}
 \end{figure}
@@ -1429,7 +1429,7 @@ This is a good test of how noticeable popping artifacts are since objects may po
 \begin{center}
 \includegraphics[width=\textwidth]{Images/Graphs/480-3000.pdf}
 \captionfonts
-\caption[Query Cap of 3000]{Data for a scene with a query cap of 3000.}
+\caption[Data for a scene with a query cap of 3000.]{Data for a scene with a query cap of 3000.}
 \label{fig:graph-3000}
 \end{center}
 \end{figure}
@@ -1438,7 +1438,7 @@ This is a good test of how noticeable popping artifacts are since objects may po
 \begin{center}
 \includegraphics[width=\textwidth]{Images/Graphs/480-4000.pdf}
 \captionfonts
-\caption[Query Cap of 4000]{Data for a scene with a query cap of 4000.}
+\caption[Data for a scene with a query cap of 4000.]{Data for a scene with a query cap of 4000.}
 \label{fig:graph-4000}
 \end{center}
 \end{figure}
@@ -1447,7 +1447,7 @@ This is a good test of how noticeable popping artifacts are since objects may po
 \begin{center}
 \includegraphics[width=\textwidth]{Images/Graphs/AverageRelative.pdf}
 \captionfonts
-\caption[Framerate Relative To Average]{Showing the framerate relative to the average framerate.  The top graph is for a query limit of 3000 and the bottom graph is for a query limit of 4000.  The horizontal lines mark the average framerates.}
+\caption[Showing the framerate relative to the average framerate.]{Showing the framerate relative to the average framerate.  The top graph is for a query limit of 3000 and the bottom graph is for a query limit of 4000.  The horizontal lines mark the average framerates.}
 \label{fig:average-relative}
 \end{center}
 \end{figure}
@@ -1513,7 +1513,7 @@ Then the front to back heuristic is performed on the grid contained within the o
 \begin{center}
 \includegraphics[width=0.75\textwidth]{Images/HierarchyCells.png}
 \captionfonts
-\caption[Grid Hierarchy]{A grid hierarchy.}
+\caption[A grid hierarchy.]{A grid hierarchy.}
 \label{fig:grid-hierarchy}
 \end{center}
 \end{figure}
@@ -1543,7 +1543,7 @@ This mesh edge list is now the stored representation of the convex 3D mesh that 
 \begin{center}
 \includegraphics[width=0.5\textwidth]{Images/RasterizingAlgorithm/Final/Frust.png}
 \captionfonts
-\caption[Point Edge List]{A view frustum converted to a point edge list.}
+\caption[A view frustum converted to a point edge list.]{A view frustum converted to a point edge list.}
 \label{fig:point-edge-list}
 \end{center}
 \end{figure}
@@ -1594,7 +1594,7 @@ This is done in increments based on the grid size as shown in Figure \ref{fig:ed
 \begin{center}
 \includegraphics[width=0.5\textwidth]{Images/RasterizingAlgorithm/Final/FrustSlice.png}
 \captionfonts
-\caption[Mesh Edge List Slice]{A mesh edge list slice with the dimensions of the grid.}
+\caption[A mesh edge list slice with the dimensions of the grid.]{A mesh edge list slice with the dimensions of the grid.}
 \label{fig:edge-list-slice}
 \end{center}
 \end{figure}
@@ -1606,7 +1606,7 @@ These points are projected into 2D and then the monotone chain algorithm is used
 \begin{center}
 \includegraphics[width=0.5\textwidth]{Images/RasterizingAlgorithm/Final/SliceOrtho.png}
 \captionfonts
-\caption[Mesh Edge List Slice 2D View]{The slice and its points projected to 2D.  The yellow lines show the convex polygon that will be rasterized after performing the monotone chain convex hull algorithm on the projected points.}
+\caption[The slice and its points projected to 2D.]{The slice and its points projected to 2D.  The yellow lines show the convex polygon that will be rasterized after performing the monotone chain convex hull algorithm on the projected points.}
 \label{fig:projected-slice}
 \end{center}
 \end{figure}
@@ -1637,7 +1637,7 @@ The range of cells to be rasterized for each row needs to be found.
 \begin{center}
 \includegraphics[width=0.5\textwidth]{Images/RasterizingAlgorithm/Final/FrustSliceNRowOrthoLabeled.png}
 \captionfonts
-\caption[Mesh Edge List Row]{A row of the slice being rasterized.}
+\caption[A row of the slice being rasterized.]{A row of the slice being rasterized.}
 \label{fig:rasterized-row}
 \end{center}
 \end{figure}
@@ -1657,7 +1657,7 @@ The range of cells to rasterize for the row is derived from these points as show
 \begin{center}
 \includegraphics[width=0.5\textwidth]{Images/RasterizingAlgorithm/Final/RasterizingInOut.png}
 \captionfonts
-\caption[Finding The Row Range]{The two sides of the polygon are being clipped against the row bottom and top.  Here the left red side is facing inward, while the right blue side is facing outward.  The active edges are boldened.}
+\caption[The two sides of the polygon are being clipped against the row bottom and top.]{The two sides of the polygon are being clipped against the row bottom and top.  Here the left red side is facing inward, while the right blue side is facing outward.  The active edges are boldened.}
 \label{fig:finding-row-range}
 \end{center}
 \end{figure}
@@ -1670,7 +1670,7 @@ The point between an outward facing edge and an inward facing edge as shown in F
 \begin{center}
 \includegraphics[width=0.5\textwidth]{Images/RasterizingAlgorithm/Final/RasterizingOuterInnerSwitch.png}
 \captionfonts
-\caption[Finding The Row Range In Orientation Switch]{Now the point between two active edges is used to determine the row range when the edge orientation changes.}
+\caption[Now the point between two active edges is used to determine the row range when the edge orientation changes.]{Now the point between two active edges is used to determine the row range when the edge orientation changes.}
 \label{fig:finding-row-range-switch}
 \end{center}
 \end{figure}
